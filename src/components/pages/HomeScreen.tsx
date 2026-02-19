@@ -58,7 +58,9 @@ export const HomeScreen: React.FC = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">📊</div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{total}</p>
@@ -66,7 +68,9 @@ export const HomeScreen: React.FC = () => {
           </div>
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-lg">✅</div>
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Completed</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{completed}</p>
@@ -74,7 +78,9 @@ export const HomeScreen: React.FC = () => {
           </div>
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-lg">🔄</div>
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">In Progress</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{inProgress}</p>
@@ -82,7 +88,9 @@ export const HomeScreen: React.FC = () => {
           </div>
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">🎯</div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Avg Score</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{avgScore > 0 ? `${avgScore}%` : '—'}</p>
@@ -105,7 +113,10 @@ export const HomeScreen: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-xl font-bold text-slate-900 truncate">{lastAssessment.name}</p>
                   {lastAssessment.address && (
-                    <p className="text-sm text-slate-500 mt-1">📍 {lastAssessment.address}</p>
+                    <p className="text-sm text-slate-500 mt-1">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{display: 'inline', verticalAlign: 'text-bottom', marginRight: '4px'}}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {lastAssessment.address}
+                    </p>
                   )}
                   <div className="flex flex-wrap gap-2 mt-3">
                     <span className={`status-pill border ${
@@ -136,7 +147,7 @@ export const HomeScreen: React.FC = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-4xl mb-3">🏢</p>
+                <p className="text-4xl mb-3"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{margin: '0 auto'}}><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/></svg></p>
                 <p className="text-lg font-semibold text-slate-700">No assessments yet</p>
                 <p className="text-sm text-slate-500 mt-1">Create your first security assessment to get started.</p>
                 <button
@@ -154,17 +165,21 @@ export const HomeScreen: React.FC = () => {
             <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
               {[
-                { icon: '🛡️', label: 'New Inspection', desc: 'Start a security assessment', href: '/create-assessment' },
-                { icon: '📋', label: 'View Reports', desc: 'Browse completed reports', href: '/reports' },
-                { icon: '👤', label: 'My Profile', desc: 'Manage your account', href: '/profile' },
-                { icon: '💼', label: 'Pricing Plans', desc: 'View available plans', href: '/pricing' },
+                { label: 'New Inspection', desc: 'Start a security assessment', href: '/create-assessment',
+                  iconSvg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> },
+                { label: 'View Reports', desc: 'Browse completed reports', href: '/reports',
+                  iconSvg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/></svg> },
+                { label: 'My Profile', desc: 'Manage your account', href: '/profile',
+                  iconSvg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
+                { label: 'Pricing Plans', desc: 'View available plans', href: '/pricing',
+                  iconSvg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
               ].map((action, i) => (
                 <button
                   key={i}
                   onClick={() => navigate(action.href)}
                   className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all duration-200 text-left w-full group"
                 >
-                  <span className="text-2xl group-hover:scale-110 transition-transform">{action.icon}</span>
+                  <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 group-hover:scale-110 transition-transform">{action.iconSvg}</span>
                   <div>
                     <span className="text-sm font-semibold text-slate-800 block">{action.label}</span>
                     <span className="text-xs text-slate-500">{action.desc}</span>
