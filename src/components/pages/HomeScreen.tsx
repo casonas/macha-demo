@@ -29,11 +29,11 @@ export const HomeScreen: React.FC = () => {
     <AppShell title="Dashboard">
       <div className="space-y-6 sm:space-y-8 flex flex-col items-center">
         {/* Welcome Hero */}
-        <div className="relative overflow-hidden rounded-2xl p-10 pb-16 sm:p-14 sm:pb-20 text-white text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
+        <div className="relative overflow-hidden rounded-2xl p-10 pb-16 sm:p-14 sm:pb-20 text-white text-center w-full flex flex-col items-center justify-center" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
           <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
-          <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">Welcome back, {firstName} 👋</h1>
+          <div className="relative z-10 w-full flex flex-col items-center text-center">
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">Welcome back, {firstName}</h1>
             <p className="mt-3 text-slate-300 text-sm sm:text-base text-center">
               Your security assessment platform is ready. Start a new inspection or review your latest reports.
             </p>
