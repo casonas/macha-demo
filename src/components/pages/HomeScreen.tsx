@@ -27,26 +27,26 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <AppShell title="Dashboard">
-      <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-6 sm:space-y-8 flex flex-col items-center">
         {/* Welcome Hero */}
-        <div className="relative overflow-hidden rounded-2xl p-8 sm:p-12 text-white text-center" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
+        <div className="relative overflow-hidden rounded-2xl p-10 pb-14 sm:p-14 sm:pb-16 text-white text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
           <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
-          <div className="relative z-10 max-w-2xl mx-auto">
+          <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">Welcome back, {firstName} 👋</h1>
-            <p className="mt-3 text-slate-300 text-sm sm:text-base">
+            <p className="mt-3 text-slate-300 text-sm sm:text-base text-center">
               Your security assessment platform is ready. Start a new inspection or review your latest reports.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3 justify-center">
+            <div className="mt-8 flex flex-wrap gap-4 justify-center pb-2">
               <button
                 onClick={() => navigate('/create-assessment')}
-                className="px-6 py-2.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg"
+                className="px-10 py-3.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg"
               >
                 + New Assessment
               </button>
               <button
                 onClick={() => navigate('/reports')}
-                className="px-6 py-2.5 border border-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all"
+                className="px-10 py-3.5 border border-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all"
               >
                 View Reports
               </button>
@@ -55,9 +55,9 @@ export const HomeScreen: React.FC = () => {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
               </div>
@@ -66,8 +66,8 @@ export const HomeScreen: React.FC = () => {
             <p className="text-3xl font-extrabold text-slate-900">{total}</p>
             <p className="text-xs text-slate-500 mt-1.5">Assessments</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
@@ -76,8 +76,8 @@ export const HomeScreen: React.FC = () => {
             <p className="text-3xl font-extrabold text-slate-900">{completed}</p>
             <p className="text-xs text-slate-500 mt-1.5">Finished reports</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </div>
@@ -86,8 +86,8 @@ export const HomeScreen: React.FC = () => {
             <p className="text-3xl font-extrabold text-slate-900">{inProgress}</p>
             <p className="text-xs text-slate-500 mt-1.5">Active inspections</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
@@ -99,18 +99,18 @@ export const HomeScreen: React.FC = () => {
         </div>
 
         {/* Main Content: Last Assessment + Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
           {/* Last Assessment Card */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
             <h3 className="text-lg font-bold text-slate-900 mb-4">Latest Assessment</h3>
             {lastAssessment ? (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="flex flex-col items-center gap-6">
                 {lastAssessment.score != null && (
                   <div className="flex-shrink-0 w-32 h-32">
                     <ScoreGauge value={lastAssessment.score} />
                   </div>
                 )}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 text-center">
                   <p className="text-xl font-bold text-slate-900 truncate">{lastAssessment.name}</p>
                   {lastAssessment.address && (
                     <p className="text-sm text-slate-500 mt-1">
@@ -118,7 +118,7 @@ export const HomeScreen: React.FC = () => {
                       {lastAssessment.address}
                     </p>
                   )}
-                  <div className="flex flex-wrap gap-2 mt-3">
+                  <div className="flex flex-wrap gap-2 mt-3 justify-center">
                     <span className={`status-pill border ${
                       lastAssessment.status === 'completed'
                         ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
@@ -152,7 +152,7 @@ export const HomeScreen: React.FC = () => {
                 <p className="text-sm text-slate-500 mt-1">Create your first security assessment to get started.</p>
                 <button
                   onClick={() => navigate('/create-assessment')}
-                  className="mt-4 px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors"
+                  className="mt-4 px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors"
                 >
                   Start First Assessment
                 </button>
@@ -161,7 +161,7 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
             <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
               {[
@@ -177,7 +177,7 @@ export const HomeScreen: React.FC = () => {
                 <button
                   key={i}
                   onClick={() => navigate(action.href)}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all duration-200 text-left w-full group"
+                  className="flex items-center justify-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all duration-200 text-center w-full group"
                 >
                   <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 group-hover:scale-110 transition-transform">{action.iconSvg}</span>
                   <div>
@@ -192,7 +192,7 @@ export const HomeScreen: React.FC = () => {
 
         {/* Recent Assessments List */}
         {assessments.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center w-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-slate-900">Recent Activity</h3>
               <button onClick={() => navigate('/reports')} className="text-sm font-semibold text-emerald-600 hover:text-emerald-700">View All →</button>
