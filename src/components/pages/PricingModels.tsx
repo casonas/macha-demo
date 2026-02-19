@@ -78,17 +78,17 @@ export const PricingModels: React.FC = () => (
                 Most Popular
               </div>
             )}
-            <div className="p-6 sm:p-8 flex flex-col flex-1">
+            <div className="p-6 sm:p-8 flex flex-col flex-1 text-center">
               <div className="mb-5">
                 <h3 className="text-xl font-extrabold text-slate-900">{plan.name}</h3>
                 <p className="text-xs text-slate-500 mt-1">{plan.description}</p>
-                <div className="mt-4 flex items-baseline gap-1">
+                <div className="mt-4 flex items-baseline justify-center gap-1">
                   <span className="text-4xl font-extrabold text-slate-900">{plan.price}</span>
                   {plan.period && <span className="text-sm font-medium text-slate-500">{plan.period}</span>}
                 </div>
               </div>
 
-              <ul className="space-y-3 flex-1 mb-6">
+              <ul className="space-y-3 flex-1 mb-6 text-left mx-auto">
                 {plan.features.map(f => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-slate-700">
                     <svg className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

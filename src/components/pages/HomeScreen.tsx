@@ -56,8 +56,8 @@ export const HomeScreen: React.FC = () => {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
               </div>
@@ -66,8 +66,8 @@ export const HomeScreen: React.FC = () => {
             <p className="text-3xl font-extrabold text-slate-900">{total}</p>
             <p className="text-xs text-slate-500 mt-1.5">Assessments</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
@@ -76,8 +76,8 @@ export const HomeScreen: React.FC = () => {
             <p className="text-3xl font-extrabold text-slate-900">{completed}</p>
             <p className="text-xs text-slate-500 mt-1.5">Finished reports</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </div>
@@ -86,8 +86,8 @@ export const HomeScreen: React.FC = () => {
             <p className="text-3xl font-extrabold text-slate-900">{inProgress}</p>
             <p className="text-xs text-slate-500 mt-1.5">Active inspections</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
@@ -101,7 +101,7 @@ export const HomeScreen: React.FC = () => {
         {/* Main Content: Last Assessment + Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Last Assessment Card */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
             <h3 className="text-lg font-bold text-slate-900 mb-4">Latest Assessment</h3>
             {lastAssessment ? (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
@@ -161,7 +161,7 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
             <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
               {[
@@ -192,7 +192,7 @@ export const HomeScreen: React.FC = () => {
 
         {/* Recent Assessments List */}
         {assessments.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-slate-900">Recent Activity</h3>
               <button onClick={() => navigate('/reports')} className="text-sm font-semibold text-emerald-600 hover:text-emerald-700">View All →</button>

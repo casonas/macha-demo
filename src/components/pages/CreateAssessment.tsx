@@ -40,13 +40,13 @@ export const CreateAssessment: React.FC = () => {
     <AppShell title="New Assessment">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center sm:text-left">
+        <div className="text-center">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Start a New Assessment</h2>
           <p className="text-sm text-slate-500 mt-2">Enter the facility details below to begin your security inspection.</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 text-center">
           {/* Assessment Name */}
           <label className="block">
             <span className="text-sm font-semibold text-slate-700">Assessment Name <span className="text-red-400">*</span></span>

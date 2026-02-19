@@ -17,8 +17,8 @@ export default function RecentAssessmentsTable({ rows }: { rows: AssessmentRow[]
 
   return (
     <div>
-      <h3 className="text-3xl font-bold text-slate-900 mb-2">Recent Assessments</h3>
-      <p className="text-sm text-slate-500 mb-4">Legend: <span className="font-semibold">High</span> = score &lt; 70 (elevated risk). <span className="font-semibold">12%</span> indicates change vs previous quarter. "Last assessment" shows the most recent assessment status.</p>
+      <h3 className="text-3xl font-bold text-slate-900 mb-2 text-center">Recent Assessments</h3>
+      <p className="text-sm text-slate-500 mb-4 text-center">Legend: <span className="font-semibold">High</span> = score &lt; 70 (elevated risk). <span className="font-semibold">12%</span> indicates change vs previous quarter. "Last assessment" shows the most recent assessment status.</p>
       <div className="space-y-3 divide-y divide-slate-100">
         {rows.map((row, idx) => {
           const initials = (row.siteLocation || '')

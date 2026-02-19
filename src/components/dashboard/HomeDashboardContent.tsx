@@ -43,7 +43,7 @@ export default function HomeDashboardContent({ stats, assessments }: { stats: Da
 
   return (
     <div className="min-h-screen bg-slate-50 p-8 lg:p-12 space-y-10" style={{ backgroundColor: '#F8FAFC' }}>
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-4">
+       <header className="flex flex-col items-center gap-6 pb-4 text-center">
         <div className="space-y-2">
           <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">Safety Dashboard</h1>
           <p className="text-base text-slate-500 font-normal">Physical Security Overview • 2026</p>
@@ -55,13 +55,13 @@ export default function HomeDashboardContent({ stats, assessments }: { stats: Da
       <section>
         {assessments[0] && assessments[0].score !== undefined ? (
           <div className="macha-card p-8 lg:p-10">
-            <div className="flex flex-col lg:flex-row items-center gap-6">
+            <div className="flex flex-col lg:flex-row items-center gap-6 text-center lg:text-center">
               <div className="flex-shrink-0">
                 <div className="w-44 h-44 bg-white rounded-lg flex items-center justify-center">
                   <ScoreGauge value={assessments[0].score} />
                 </div>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 text-center">
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Last Assessment</p>
                 <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 mt-2">{assessments[0].siteName || assessments[0].schoolName || 'Untitled Site'}</h2>
                 <p className="mt-3 text-lg font-semibold text-slate-700">Status: <span className="font-black">{assessments[0].score}%</span> — <span className="text-sm text-slate-500">{assessments[0].assessorName || 'Lead Analyst'}</span></p>
@@ -73,8 +73,8 @@ export default function HomeDashboardContent({ stats, assessments }: { stats: Da
             </div>
           </div>
         ) : (
-          <div className="macha-card p-8 lg:p-10">
-            <div className="flex items-center justify-between">
+          <div className="macha-card p-8 lg:p-10 text-center">
+            <div className="flex items-center justify-center">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Last Assessment</p>
                 <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 mt-2">No recent assessments</h2>

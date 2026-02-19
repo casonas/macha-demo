@@ -42,7 +42,7 @@ export default function ActionTiles() {
 
   return (
     <div>
-      <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
+      <h3 className="text-lg font-bold text-slate-900 mb-4 text-center">Quick Actions</h3>
       <div className="grid grid-cols-1 gap-3">
         {actions.map((action, i) => {
           const Icon = action.icon;
@@ -50,7 +50,7 @@ export default function ActionTiles() {
             <button
               key={i}
               onClick={() => navigate(action.href)}
-              className="flex items-center gap-4 p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-md transition-all duration-200 text-left w-full"
+              className="flex items-center justify-center gap-4 p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-md transition-all duration-200 text-center w-full"
             >
               <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700">
                 <Icon />
