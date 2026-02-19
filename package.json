@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "npm run build:css && react-scripts start",
-    "build:css": "npx tailwindcss -i ./src/App.css -o ./src/index.css && node -e \"const fs=require('fs');const f='./src/index.css';fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/calc\\(infinity \\* 1px\\)/g,'9999px'))\"",
+    "build:css": "npx tailwindcss -i ./src/App.css -o ./src/index.css && node scripts/fix-css-compat.js",
     "watch:css": "npx tailwindcss -i ./src/App.css -o ./src/index.css --watch",
     "build": "npm run build:css && react-scripts build",
     "test": "react-scripts test",
