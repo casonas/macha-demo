@@ -37,7 +37,7 @@ export const HomeScreen: React.FC = () => {
             <p className="text-slate-300 text-sm sm:text-lg text-center max-w-xl">
               Your security assessment platform is ready. Start a new inspection or review your latest reports.
             </p>
-            <div className="mt-4 flex flex-wrap gap-4 justify-center">
+            <div className="flex flex-wrap gap-4 justify-center">
               <button
                 onClick={() => navigate('/create-assessment')}
                 className="px-6 py-3.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg whitespace-nowrap"
