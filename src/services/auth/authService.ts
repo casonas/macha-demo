@@ -1,0 +1,187 @@
+/**
+ * Mock Authentication Service
+ * Simulates HTTP-only cookie authentication pattern
+ * Replace with real Firebase Auth + Cloud Functions in production
+ */
+
+export interface User {
+  id: string;
+  email: string;
+  displayName: string;
+  roles: ('admin' | 'user' | 'manager')[];
+  assignedBuildings: string[];
+}
+
+export interface AuthSession {
+  user: User;
+  token: string;
+  expiresAt: number;
+}
+
+let MOCK_USERS: Record<string, { password: string; user: User }> = {
+  'admin@machagroup.com': {
+    password: 'admin123',
+    user: {
+      id: 'user-001',
+      email: 'admin@machagroup.com',
+      displayName: 'Admin User',
+      roles: ['admin'],
+      assignedBuildings: ['*']
+    }
+  },
+  'user@school.edu': {
+    password: 'user123',
+    user: {
+      id: 'user-002',
+      email: 'user@school.edu',
+      displayName: 'School Administrator',
+      roles: ['user'],
+      assignedBuildings: ['building-001', 'building-002']
+    }
+  }
+};
+
+type AuthStateListener = (user: User | null) => void;
+const listeners: AuthStateListener[] = [];
+
+const loginAttempts = new Map<string, { count: number; lockedUntil?: number }>();
+const MAX_ATTEMPTS = Number(process.env.REACT_APP_MAX_LOGIN_ATTEMPTS || 5);
+const LOCK_WINDOW_MS = 10 * 60 * 1000;
+
+function notifyListeners(user: User | null) {
+  listeners.forEach(listener => listener(user));
+}
+
+function setSession(user: User) {
+  const session: AuthSession = {
+    user,
+    token: `mock-token-${Date.now()}`,
+    expiresAt: Date.now() + 3600000
+  };
+  localStorage.setItem('mockAuthSession', JSON.stringify(session));
+}
+
+export function subscribeToAuthState(listener: AuthStateListener): () => void {
+  listeners.push(listener);
+  return () => {
+    const index = listeners.indexOf(listener);
+    if (index > -1) listeners.splice(index, 1);
+  };
+}
+
+export async function login(email: string, password: string): Promise<User> {
+  await new Promise(resolve => setTimeout(resolve, 500));
+  const key = email.toLowerCase();
+  const record = MOCK_USERS[key];
+
+  const attempt = loginAttempts.get(key);
+  if (attempt?.lockedUntil && Date.now() < attempt.lockedUntil) {
+    throw new Error('Too many login attempts. Try again later.');
+  }
+
+  if (!record || record.password !== password) {
+    const next = (attempt?.count || 0) + 1;
+    if (next >= MAX_ATTEMPTS) {
+      loginAttempts.set(key, { count: next, lockedUntil: Date.now() + LOCK_WINDOW_MS });
+      throw new Error('Account temporarily locked after too many attempts.');
+    }
+    loginAttempts.set(key, { count: next });
+    throw new Error('Invalid email or password');
+  }
+
+  loginAttempts.delete(key);
+  setSession(record.user);
+  notifyListeners(record.user);
+  return record.user;
+}
+
+export async function register(input: { displayName: string; email: string; password: string }): Promise<User> {
+  await new Promise(resolve => setTimeout(resolve, 500));
+  const key = input.email.toLowerCase();
+
+  if (MOCK_USERS[key]) {
+    throw new Error('An account with this email already exists');
+  }
+
+  if (input.password.length < 8 || !/[A-Z]/.test(input.password) || !/[0-9]/.test(input.password)) {
+    throw new Error('Password must be 8+ chars and include at least one uppercase letter and one number.');
+  }
+
+  const user: User = {
+    id: `user-${Date.now()}`,
+    email: key,
+    displayName: input.displayName,
+    roles: ['user'],
+    assignedBuildings: ['building-001']
+  };
+
+  MOCK_USERS = {
+    ...MOCK_USERS,
+    [key]: { password: input.password, user }
+  };
+
+  setSession(user);
+  notifyListeners(user);
+  return user;
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, 400));
+  // Mock only: in prod call Firebase reset API
+  void email;
+}
+
+export async function updateCurrentUserProfile(input: { displayName: string }): Promise<User | null> {
+  const current = await getCurrentUser();
+  if (!current) return null;
+
+  const updated: User = { ...current, displayName: input.displayName };
+
+  const key = updated.email.toLowerCase();
+  if (MOCK_USERS[key]) {
+    MOCK_USERS[key] = { ...MOCK_USERS[key], user: updated };
+  }
+
+  setSession(updated);
+  notifyListeners(updated);
+  return updated;
+}
+
+export async function logout(): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, 250));
+  localStorage.removeItem('mockAuthSession');
+  notifyListeners(null);
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+  const sessionJson = localStorage.getItem('mockAuthSession');
+  if (!sessionJson) return null;
+
+  try {
+    const session: AuthSession = JSON.parse(sessionJson);
+    if (Date.now() > session.expiresAt) {
+      localStorage.removeItem('mockAuthSession');
+      return null;
+    }
+    return session.user;
+  } catch {
+    return null;
+  }
+}
+
+export async function isAuthenticated(): Promise<boolean> {
+  return (await getCurrentUser()) !== null;
+}
+
+export async function hasRole(role: string): Promise<boolean> {
+  const user = await getCurrentUser();
+  return user?.roles.includes(role as any) || false;
+}
+
+export async function refreshSession(): Promise<void> {
+  const sessionJson = localStorage.getItem('mockAuthSession');
+  if (!sessionJson) return;
+  const session: AuthSession = JSON.parse(sessionJson);
+  session.expiresAt = Date.now() + 3600000;
+  localStorage.setItem('mockAuthSession', JSON.stringify(session));
+}

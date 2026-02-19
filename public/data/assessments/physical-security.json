@@ -1,0 +1,103 @@
+{
+  "id": "physical-security",
+  "version": "1.0.0",
+  "metadata": {
+    "title": "Physical Security Assessment",
+    "description": "Comprehensive evaluation of physical security measures including access control, surveillance, and perimeter security.",
+    "lastUpdated": "2026-02-17T00:00:00Z",
+    "author": "Macha Group",
+    "estimatedDuration": 45,
+    "tags": ["physical", "security", "access-control", "surveillance"]
+  },
+  "categories": [
+    {
+      "id": "access-control",
+      "title": "Access Control Systems",
+      "description": "Evaluation of keypads, card readers, and biometric systems",
+      "icon": "lock",
+      "questions": [
+        {
+          "id": "keypadsOperational",
+          "type": "boolean",
+          "text": "Are the access control keypads operational and functioning as intended?",
+          "helpText": "Check if all keypads are powered on and responsive",
+          "required": true,
+          "hasCommentField": true
+        },
+        {
+          "id": "keypadsReliableAuthentication",
+          "type": "boolean",
+          "text": "Do the keypads reliably authenticate users and grant access to restricted areas?",
+          "required": true,
+          "hasCommentField": true
+        },
+        {
+          "id": "keypadsSecureCodes",
+          "type": "scale",
+          "text": "Are access codes used with the keypads sufficiently secure and resistant to unauthorized access or guessing?",
+          "helpText": "Rate on scale of 1-5 where 5 is most secure",
+          "required": true,
+          "hasCommentField": true
+        },
+        {
+          "id": "keypadsChangeCodes",
+          "type": "boolean",
+          "text": "Is there a process for periodically changing access codes to enhance security?",
+          "required": true,
+          "hasCommentField": true
+        }
+      ]
+    },
+    {
+      "id": "card-readers",
+      "title": "Card Reader Systems",
+      "description": "Assessment of card reader functionality and security",
+      "icon": "credit-card",
+      "questions": [
+        {
+          "id": "cardReadersMalfunction",
+          "type": "boolean",
+          "text": "Are there any signs of malfunction or errors in card reader operations?",
+          "required": true,
+          "hasCommentField": true
+        },
+        {
+          "id": "cardReadersBackupSystems",
+          "type": "boolean",
+          "text": "Are there backup systems in place in case of power outages or malfunctions?",
+          "required": true,
+          "hasCommentField": true
+        },
+        {
+          "id": "cardReadersInstructions",
+          "type": "boolean",
+          "text": "Are there instructions or guidelines available to users regarding proper card usage and access procedures?",
+          "required": false,
+          "hasCommentField": true
+        }
+      ]
+    },
+    {
+      "id": "surveillance",
+      "title": "Surveillance Systems",
+      "description": "Evaluation of CCTV cameras and monitoring capabilities",
+      "icon": "video",
+      "questions": [
+        {
+          "id": "surveillanceRealTimeMonitoring",
+          "type": "boolean",
+          "text": "Is there real-time monitoring and recording of camera feeds from entrances?",
+          "required": true,
+          "hasCommentField": true
+        },
+        {
+          "id": "surveillanceCoverage",
+          "type": "text",
+          "text": "What areas are covered by surveillance cameras? Describe blind spots if any.",
+          "required": true,
+          "hasCommentField": false
+        }
+      ]
+    }
+  ]
+}

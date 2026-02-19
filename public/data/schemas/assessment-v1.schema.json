@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SecurityAssessment",
+  "type": "object",
+  "required": ["id", "version", "metadata", "categories"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "URL-safe unique identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["title", "description", "lastUpdated"],
+      "properties": {
+        "title": { "type": "string", "minLength": 3, "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 },
+        "lastUpdated": { "type": "string", "format": "date-time" },
+        "author": { "type": "string" },
+        "estimatedDuration": { "type": "integer", "minimum": 1 },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 10
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "questions"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "title": { "type": "string", "minLength": 3, "maxLength": 100 },
+          "description": { "type": "string", "maxLength": 300 },
+          "icon": { "type": "string" },
+          "questions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "type", "text"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9]*$" },
+                "type": {
+                  "type": "string",
+                  "enum": ["boolean", "scale", "text", "select", "comment"]
+                },
+                "text": { "type": "string", "minLength": 10, "maxLength": 500 },
+                "helpText": { "type": "string", "maxLength": 200 },
+                "required": { "type": "boolean", "default": false },
+                "hasCommentField": { "type": "boolean", "default": false },
+                "commentPrompt": { "type": "string", "default": "Comment (Optional)" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

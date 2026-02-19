@@ -1,0 +1,47 @@
+.auth-guard__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+  /* Updated to match your light grey-green background */
+  background: #f0f4f0; 
+}
+
+.auth-guard__spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  /* Updated: Changed from purple-blue to Macha Forest Green */
+  border-top-color: #228b22; 
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.auth-guard__unauthorized {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 2rem;
+  /* Matches the app's clean workspace background */
+  background: #f8fafc;
+}
+
+.auth-guard__unauthorized h2 {
+  /* Kept Red for "Unauthorized" as it is a standard security warning */
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+}
+
+.auth-guard__unauthorized p {
+  /* Updated to your deep charcoal-green text color */
+  color: #050805; 
+}

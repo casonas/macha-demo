@@ -1,0 +1,83 @@
+.login-mock {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(circle at center, #0a1a0a 0%, #050805 100%);
+}
+
+.login-mock__card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.login-mock__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-mock__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #050805;
+  margin: 0 0 0.5rem 0;
+}
+
+.login-mock__subtitle {
+  font-size: 1rem;
+  color: #4a5d4a;
+  margin: 0;
+}
+
+.login-mock__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.login-mock__error {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 0.875rem;
+}
+
+.login-mock__demo {
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.login-mock__demo h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #228b22;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.login-mock__credentials {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.credential {
+  font-size: 0.875rem;
+  color: #6b7280;
+  padding: 0.5rem;
+  background: #f0f4f0;
+  border-radius: 6px;
+}
+
+.credential strong {
+  color: #228b22;
+}
