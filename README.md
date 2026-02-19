@@ -67,7 +67,7 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 ```
 
-Add your keys to a `.env` file at the project root (never commit this file):
+Add your keys to a `.env` file at the project root (never commit this file). Create React App automatically exposes variables prefixed with `REACT_APP_`:
 
 ```
 REACT_APP_FIREBASE_API_KEY=your-key
