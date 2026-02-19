@@ -9,11 +9,10 @@ interface AppShellProps {
 }
 
 const navItems = [
-  { to: '/home', label: 'Home' },
-  { to: '/assessment', label: 'Assessment' },
-  { to: '/past-assessments', label: 'Past Assessments' },
-  { to: '/create-assessment', label: 'Create Assessment' },
-  { to: '/profile', label: 'User Profile' },
+  { to: '/home', label: 'Dashboard' },
+  { to: '/create-assessment', label: 'New Assessment' },
+  { to: '/reports', label: 'Reports' },
+  { to: '/profile', label: 'My Profile' },
   { to: '/pricing', label: 'Pricing' },
   { to: '/about', label: 'About Us' }
 ];

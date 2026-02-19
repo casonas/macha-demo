@@ -11,6 +11,7 @@ import { PastAssessments } from './components/pages/PastAssessments';
 import { PricingModels } from './components/pages/PricingModels';
 import { AboutUs } from './components/pages/AboutUs';
 import { CreateAssessment } from './components/pages/CreateAssessment';
+import { ReportView } from './components/pages/ReportView';
 import './App.css';
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -29,12 +30,15 @@ function App() {
         {/* Protected routes */}
         <Route path="/home" element={<Protected><HomeScreen /></Protected>} />
         <Route path="/assessment" element={<Protected><AssessmentDemo /></Protected>} />
-        <Route path="/past-assessments" element={<Protected><PastAssessments /></Protected>} />
+        <Route path="/reports" element={<Protected><PastAssessments /></Protected>} />
+        <Route path="/report/:id" element={<Protected><ReportView /></Protected>} />
         <Route path="/create-assessment" element={<Protected><CreateAssessment /></Protected>} />
         <Route path="/profile" element={<Protected><UserProfile /></Protected>} />
         <Route path="/pricing" element={<Protected><PricingModels /></Protected>} />
         <Route path="/about" element={<Protected><AboutUs /></Protected>} />
 
+        {/* Redirects for old routes */}
+        <Route path="/past-assessments" element={<Navigate to="/reports" replace />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

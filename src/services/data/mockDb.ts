@@ -10,11 +10,15 @@ export interface AssessmentRecord {
   createdAt: string;
   updatedAt: string;
   responses: Record<string, any>;
+  address?: string;
+  buildingType?: string;
 }
 
 export interface UserProfileRecord {
   displayName: string;
   phone?: string;
+  address?: string;
+  userId?: string;
 }
 
 const ASSESS_KEY = 'macha.assessments';
@@ -50,7 +54,7 @@ export function upsertAssessment(record: AssessmentRecord) {
   save(ASSESS_KEY, all);
 }
 
-export function createAssessment(input: { name: string; buildingId: string; assessmentId: string }): AssessmentRecord {
+export function createAssessment(input: { name: string; buildingId: string; assessmentId: string; address?: string; buildingType?: string }): AssessmentRecord {
   const id = `AS-${Date.now()}`;
   const rec: AssessmentRecord = {
     id,
@@ -60,7 +64,9 @@ export function createAssessment(input: { name: string; buildingId: string; asse
     status: 'in-progress',
     createdAt: now(),
     updatedAt: now(),
-    responses: {}
+    responses: {},
+    address: input.address,
+    buildingType: input.buildingType
   };
   upsertAssessment(rec);
   setActiveAssessmentId(id);

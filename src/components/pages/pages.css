@@ -155,3 +155,31 @@ grid-template-columns: 1fr;
 
 
 @media (max-width: 960px){ .grid-3 { grid-template-columns: 1fr; } }
+
+/* Print styles for report generation */
+@media print {
+  .shell__sidebar,
+  .shell__header,
+  .no-print {
+    display: none !important;
+  }
+  .shell {
+    display: block !important;
+  }
+  .shell__main {
+    padding: 0 !important;
+  }
+  .shell__content {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+  .print-section {
+    break-inside: avoid;
+  }
+  body {
+    background: white !important;
+  }
+}
