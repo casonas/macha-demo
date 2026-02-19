@@ -29,10 +29,10 @@ export const HomeScreen: React.FC = () => {
     <AppShell title="Dashboard">
       <div className="space-y-6 sm:space-y-8 flex flex-col items-center">
         {/* Welcome Hero */}
-        <div className="relative overflow-hidden rounded-2xl p-10 pb-14 sm:p-14 sm:pb-16 text-white text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
+        <div className="relative overflow-hidden rounded-2xl p-10 pb-16 sm:p-14 sm:pb-20 text-white text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
           <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
-          <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
+          <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">Welcome back, {firstName} 👋</h1>
             <p className="mt-3 text-slate-300 text-sm sm:text-base text-center">
               Your security assessment platform is ready. Start a new inspection or review your latest reports.
@@ -40,13 +40,13 @@ export const HomeScreen: React.FC = () => {
             <div className="mt-8 flex flex-wrap gap-4 justify-center pb-2">
               <button
                 onClick={() => navigate('/create-assessment')}
-                className="px-10 py-3.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg"
+                className="px-6 py-3.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg whitespace-nowrap"
               >
                 + New Assessment
               </button>
               <button
                 onClick={() => navigate('/reports')}
-                className="px-10 py-3.5 border border-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all"
+                className="px-6 py-3.5 border border-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all whitespace-nowrap"
               >
                 View Reports
               </button>
@@ -101,8 +101,8 @@ export const HomeScreen: React.FC = () => {
         {/* Main Content: Last Assessment + Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
           {/* Last Assessment Card */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Latest Assessment</h3>
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center">
+            <h3 className="text-lg font-bold text-slate-900 mb-6">Latest Assessment</h3>
             {lastAssessment ? (
               <div className="flex flex-col items-center gap-6">
                 {lastAssessment.score != null && (
@@ -152,7 +152,7 @@ export const HomeScreen: React.FC = () => {
                 <p className="text-sm text-slate-500 mt-1">Create your first security assessment to get started.</p>
                 <button
                   onClick={() => navigate('/create-assessment')}
-                  className="mt-4 px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors"
+                  className="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors whitespace-nowrap"
                 >
                   Start First Assessment
                 </button>
@@ -161,9 +161,9 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
-            <div className="space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10">
+            <h3 className="text-lg font-bold text-slate-900 mb-6">Quick Actions</h3>
+            <div className="space-y-3 w-full">
               {[
                 { label: 'New Inspection', desc: 'Start a security assessment', href: '/create-assessment',
                   iconSvg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> },
@@ -177,7 +177,7 @@ export const HomeScreen: React.FC = () => {
                 <button
                   key={i}
                   onClick={() => navigate(action.href)}
-                  className="flex items-center justify-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all duration-200 text-center w-full group"
+                  className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all duration-200 text-left w-full group"
                 >
                   <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 group-hover:scale-110 transition-transform">{action.iconSvg}</span>
                   <div>
@@ -192,7 +192,7 @@ export const HomeScreen: React.FC = () => {
 
         {/* Recent Assessments List */}
         {assessments.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center w-full">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center w-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-slate-900">Recent Activity</h3>
               <button onClick={() => navigate('/reports')} className="text-sm font-semibold text-emerald-600 hover:text-emerald-700">View All →</button>

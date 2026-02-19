@@ -38,15 +38,15 @@ export const CreateAssessment: React.FC = () => {
 
   return (
     <AppShell title="New Assessment">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 flex flex-col items-center">
         {/* Header */}
-        <div className="text-center">
+        <div className="text-center w-full">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Start a New Assessment</h2>
           <p className="text-sm text-slate-500 mt-2">Enter the facility details below to begin your security inspection.</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 text-center">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 space-y-6 text-center w-full">
           {/* Assessment Name */}
           <label className="block">
             <span className="text-sm font-semibold text-slate-700">Assessment Name <span className="text-red-400">*</span></span>
@@ -98,7 +98,7 @@ export const CreateAssessment: React.FC = () => {
           <button
             onClick={onCreate}
             disabled={!isValid}
-            className={`w-full rounded-xl py-3.5 font-bold text-sm transition-all duration-200 ${
+            className={`w-full rounded-xl py-3.5 px-6 font-bold text-sm transition-all duration-200 whitespace-nowrap ${
               isValid
                 ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md hover:shadow-lg'
                 : 'bg-slate-100 text-slate-400 cursor-not-allowed'

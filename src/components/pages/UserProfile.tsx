@@ -20,7 +20,7 @@ export const UserProfile: React.FC = () => {
     <AppShell title="My Profile">
       <div className="max-w-3xl mx-auto space-y-6 flex flex-col items-center">
         {/* Profile Header */}
-        <div className="relative overflow-hidden rounded-2xl p-8 sm:p-10 text-white flex flex-col items-center gap-5 text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
+        <div className="relative overflow-hidden rounded-2xl p-10 sm:p-12 text-white flex flex-col items-center gap-5 text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
           <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
           <div className="relative z-10 w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-3xl font-extrabold text-white border-2 border-white/30 mx-auto">
@@ -34,9 +34,9 @@ export const UserProfile: React.FC = () => {
         </div>
 
         {/* Account Details Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center w-full">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center w-full flex flex-col items-center">
           <h3 className="text-lg font-bold text-slate-900 mb-6">Account Details</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-lg mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl mx-auto">
             <div className="block">
               <span className="text-sm font-semibold text-slate-700">Full Name</span>
               <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
@@ -65,8 +65,8 @@ export const UserProfile: React.FC = () => {
         </div>
 
         {/* Assessment History */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center w-full">
-          <h3 className="text-lg font-bold text-slate-900 mb-4">Assessment History</h3>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center w-full flex flex-col items-center">
+          <h3 className="text-lg font-bold text-slate-900 mb-6">Assessment History</h3>
           {assessments.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-4xl mb-2">📋</p>

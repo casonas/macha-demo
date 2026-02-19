@@ -13,16 +13,16 @@ export const PastAssessments: React.FC = () => {
 
   return (
     <AppShell title="Reports">
-      <div className="space-y-6">
+      <div className="space-y-6 flex flex-col items-center">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full text-center sm:text-left">
           <div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Assessment Reports</h2>
             <p className="text-sm text-slate-500 mt-1">{rows.length} total · {completed.length} completed · {inProgress.length} in progress</p>
           </div>
           <button
             onClick={() => navigate('/create-assessment')}
-            className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors shadow-sm"
+            className="px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors shadow-sm whitespace-nowrap"
           >
             + New Assessment
           </button>
