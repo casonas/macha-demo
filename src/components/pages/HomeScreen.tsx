@@ -29,24 +29,24 @@ export const HomeScreen: React.FC = () => {
     <AppShell title="Dashboard">
       <div className="space-y-6 sm:space-y-8">
         {/* Welcome Hero */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-800 via-emerald-700 to-emerald-900 p-6 sm:p-10 text-white">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600 rounded-full opacity-20 -translate-y-1/2 translate-x-1/3" />
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-emerald-500 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" />
-          <div className="relative z-10">
+        <div className="relative overflow-hidden rounded-2xl p-8 sm:p-12 text-white text-center" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
+          <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
+          <div className="relative z-10 max-w-2xl mx-auto">
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">Welcome back, {firstName} 👋</h1>
-            <p className="mt-2 text-emerald-100 text-sm sm:text-base max-w-xl">
+            <p className="mt-3 text-slate-300 text-sm sm:text-base">
               Your security assessment platform is ready. Start a new inspection or review your latest reports.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3 justify-center">
               <button
                 onClick={() => navigate('/create-assessment')}
-                className="px-5 py-2.5 bg-white text-emerald-800 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg"
+                className="px-6 py-2.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg"
               >
                 + New Assessment
               </button>
               <button
                 onClick={() => navigate('/reports')}
-                className="px-5 py-2.5 border border-emerald-400 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-all"
+                className="px-6 py-2.5 border border-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all"
               >
                 View Reports
               </button>
@@ -56,37 +56,37 @@ export const HomeScreen: React.FC = () => {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">📊</div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{total}</p>
-            <p className="text-xs text-slate-500 mt-1">Assessments</p>
+            <p className="text-xs text-slate-500 mt-1.5">Assessments</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-lg">✅</div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Completed</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{completed}</p>
-            <p className="text-xs text-slate-500 mt-1">Finished reports</p>
+            <p className="text-xs text-slate-500 mt-1.5">Finished reports</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-lg">🔄</div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">In Progress</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{inProgress}</p>
-            <p className="text-xs text-slate-500 mt-1">Active inspections</p>
+            <p className="text-xs text-slate-500 mt-1.5">Active inspections</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">🎯</div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Avg Score</span>
             </div>
             <p className="text-3xl font-extrabold text-slate-900">{avgScore > 0 ? `${avgScore}%` : '—'}</p>
-            <p className="text-xs text-slate-500 mt-1">Security rating</p>
+            <p className="text-xs text-slate-500 mt-1.5">Security rating</p>
           </div>
         </div>
 
