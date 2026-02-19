@@ -68,8 +68,8 @@
 
 .shell__main { padding: 1.5rem 2rem 2rem; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
 .shell__header { width: 100%; max-width: 1200px; }
-.shell__header h2 { margin: .25rem 0 1rem; color: var(--text); font-weight:700; text-align: center; }
-.shell__content { background: rgba(255,255,255,.85); border: 1px solid rgba(226,232,240,0.9); border-radius: 18px; padding: 1.5rem; box-shadow: 0 6px 18px rgba(15,23,42,0.04); width: 100%; max-width: 1200px; }
+.shell__header h2 { margin: .25rem 0 1rem; color: var(--text); font-weight:700; text-align: center; font-size: 2rem; }
+.shell__content { background: rgba(255,255,255,.85); border: 1px solid rgba(226,232,240,0.9); border-radius: 18px; padding: 1rem 2.5rem 2.5rem 2.5rem; box-shadow: 0 6px 18px rgba(15,23,42,0.04); width: 100%; max-width: 1200px; }
 
 .container-wide { max-width: 1200px; margin: 0 auto; }
 
@@ -94,7 +94,7 @@
   .brand__title { font-size: 0.95rem; }
   .brand__subtitle { font-size: 0.7rem; }
   .shell__main { padding: 0.75rem; align-items: stretch; }
-  .shell__content { padding: 1rem; border-radius: 14px; }
+  .shell__content { padding: 1.5rem; border-radius: 14px; }
 }
 
 /* Sidebar slide-in when open (mobile) */
