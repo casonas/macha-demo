@@ -29,7 +29,7 @@ export const HomeScreen: React.FC = () => {
     <AppShell title="Dashboard">
       <div className="space-y-6 sm:space-y-8 flex flex-col items-center">
         {/* Welcome Hero */}
-        <div className="relative overflow-hidden rounded-2xl p-10 pb-16 sm:p-14 sm:pb-20 text-white text-center w-full flex flex-col items-center justify-center" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
+        <div className="relative overflow-hidden rounded-2xl p-12 pb-24 sm:p-16 sm:pb-28 text-white text-center w-full flex flex-col items-center justify-center" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
           <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
           <div className="relative z-10 w-full flex flex-col items-center text-center">

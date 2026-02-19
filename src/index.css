@@ -750,8 +750,8 @@
   .pb-4 {
     padding-bottom: calc(var(--spacing) * 4);
   }
-  .pb-16 {
-    padding-bottom: calc(var(--spacing) * 16);
+  .pb-24 {
+    padding-bottom: calc(var(--spacing) * 24);
   }
   .text-center {
     text-align: center;
@@ -1159,14 +1159,14 @@
       padding: calc(var(--spacing) * 12);
     }
   }
-  .sm\:p-14 {
+  .sm\:p-16 {
     @media (width >= 40rem) {
-      padding: calc(var(--spacing) * 14);
+      padding: calc(var(--spacing) * 16);
     }
   }
-  .sm\:pb-20 {
+  .sm\:pb-28 {
     @media (width >= 40rem) {
-      padding-bottom: calc(var(--spacing) * 20);
+      padding-bottom: calc(var(--spacing) * 28);
     }
   }
   .sm\:text-left {
