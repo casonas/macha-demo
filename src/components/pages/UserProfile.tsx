@@ -18,7 +18,7 @@ export const UserProfile: React.FC = () => {
 
   return (
     <AppShell title="My Profile">
-      <div className="max-w-3xl mx-auto space-y-6 flex flex-col items-center">
+      <div className="space-y-6 flex flex-col items-center w-full">
         {/* Profile Header */}
         <div className="relative overflow-hidden rounded-2xl p-10 sm:p-12 text-white flex flex-col items-center gap-5 text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
