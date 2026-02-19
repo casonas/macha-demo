@@ -57,15 +57,15 @@ const plans = [
 
 export const PricingModels: React.FC = () => (
   <AppShell title="Pricing">
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8 flex flex-col items-center">
       {/* Header */}
-      <div className="text-center">
+      <div className="text-center w-full">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Simple, Transparent Pricing</h2>
-        <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto">Choose the plan that fits your organization. All plans include our core security assessment platform.</p>
+        <p className="text-sm text-slate-500 mt-2 max-w-lg mx-auto">Choose the plan that fits your organization. All plans include our core security assessment platform.</p>
       </div>
 
       {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
         {plans.map(plan => (
           <article
             key={plan.name}
@@ -112,7 +112,7 @@ export const PricingModels: React.FC = () => (
       </div>
 
       {/* FAQ/Contact */}
-      <div className="text-center bg-slate-50 rounded-2xl p-8 border border-slate-200">
+      <div className="text-center bg-slate-50 rounded-2xl p-8 border border-slate-200 w-full">
         <p className="text-sm text-slate-600">
           Need a custom solution? <strong>Contact our team</strong> for a personalized quote and demo.
         </p>
