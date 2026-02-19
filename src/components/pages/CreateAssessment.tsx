@@ -38,7 +38,7 @@ export const CreateAssessment: React.FC = () => {
 
   return (
     <AppShell title="New Assessment">
-      <div className="max-w-2xl mx-auto space-y-6 flex flex-col items-center">
+      <div className="space-y-6 flex flex-col items-center w-full">
         {/* Header */}
         <div className="text-center w-full">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Start a New Assessment</h2>
