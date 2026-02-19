@@ -104,7 +104,7 @@ export const CreateAssessment: React.FC = () => {
                 : 'bg-slate-100 text-slate-400 cursor-not-allowed'
             }`}
           >
-            🚀 Begin Security Assessment
+            Begin Security Assessment
           </button>
         </div>
       </div>

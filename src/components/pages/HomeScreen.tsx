@@ -33,7 +33,7 @@ export const HomeScreen: React.FC = () => {
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
           <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
           <div className="relative z-10 w-full flex flex-col items-center text-center gap-5">
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">Welcome back, {firstName}</h1>
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mt-3">Welcome back, {firstName}</h1>
             <p className="text-slate-300 text-sm sm:text-lg text-center max-w-xl">
               Your security assessment platform is ready. Start a new inspection or review your latest reports.
             </p>
