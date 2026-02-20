@@ -23,7 +23,7 @@ onSave,
 initialData
 }: AssessmentFormProps): JSX.Element => {
 const { assessment, loading, error } = useAssessment(assessmentId);
-const { responses, updateResponse, updateComment, getResponse, getComment } =
+const { responses, updateResponse, updateComment, getResponse, getComment, getPhotos, updatePhotos } =
 useAssessmentResponse(initialData);
 
 const [activeCategory, setActiveCategory] = useState<number>(0);
@@ -383,6 +383,8 @@ onChange={(value) => updateResponse(question.id, value)}
 onCommentChange={(comment) => updateComment(question.id, comment)}
 error={validationErrors[question.id]}
 searchQuery={activeQuery}
+photos={getPhotos(question.id)}
+onPhotosChange={(p) => updatePhotos(question.id, p)}
 />
 </div>
 ))}

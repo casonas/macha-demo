@@ -40,6 +40,7 @@
 /* Comprehensive Create Account */
 .auth-card--wide {
   width: min(94vw, 620px);
+  overflow: hidden;
 }
 
 .create-account__header {
@@ -103,6 +104,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.9rem;
+}
+
+.create-account__row > * {
+  min-width: 0;
 }
 
 .create-account__row--3 {

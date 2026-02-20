@@ -64,6 +64,9 @@ interface UseAssessmentResponseReturn {
   getComment: (questionId: string) => string;
   isComplete: (requiredQuestionIds: string[]) => boolean;
   resetResponses: () => void;
+  photos: Record<string, { name: string; dataUrl: string }[]>;
+  updatePhotos: (questionId: string, photos: { name: string; dataUrl: string }[]) => void;
+  getPhotos: (questionId: string) => { name: string; dataUrl: string }[];
 }
 
 /**
@@ -73,6 +76,7 @@ export function useAssessmentResponse(
   initialResponses: ResponseData = {}
 ): UseAssessmentResponseReturn {
   const [responses, setResponses] = useState<ResponseData>(initialResponses);
+  const [photos, setPhotos] = useState<Record<string, { name: string; dataUrl: string }[]>>({});
 
   const updateResponse = useCallback((questionId: string, value: any) => {
     setResponses(prev => ({
@@ -107,7 +111,16 @@ export function useAssessmentResponse(
 
   const resetResponses = useCallback(() => {
     setResponses({});
+    setPhotos({});
   }, []);
+
+  const updatePhotos = useCallback((questionId: string, questionPhotos: { name: string; dataUrl: string }[]) => {
+    setPhotos(prev => ({ ...prev, [questionId]: questionPhotos }));
+  }, []);
+
+  const getPhotos = useCallback((questionId: string): { name: string; dataUrl: string }[] => {
+    return photos[questionId] || [];
+  }, [photos]);
 
   return {
     responses,
@@ -116,6 +129,9 @@ export function useAssessmentResponse(
     getResponse,
     getComment,
     isComplete,
-    resetResponses
+    resetResponses,
+    photos,
+    updatePhotos,
+    getPhotos
   };
 }
