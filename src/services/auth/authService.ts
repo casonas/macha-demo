@@ -1,8 +1,21 @@
 /**
- * Mock Authentication Service
- * Simulates HTTP-only cookie authentication pattern
- * Replace with real Firebase Auth + Cloud Functions in production
+ * Authentication Service
+ * Uses Firebase Auth when configured, falls back to mock for development.
+ * Set REACT_APP_DATA_PROVIDER=firebase in .env to enable Firebase Auth.
  */
+
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  type User as FirebaseUser
+} from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+
+const USE_FIREBASE = process.env.REACT_APP_DATA_PROVIDER === 'firebase';
 
 export interface User {
   id: string;
@@ -52,6 +65,16 @@ function notifyListeners(user: User | null) {
   listeners.forEach(listener => listener(user));
 }
 
+function firebaseUserToUser(fbUser: FirebaseUser): User {
+  return {
+    id: fbUser.uid,
+    email: fbUser.email || '',
+    displayName: fbUser.displayName || '',
+    roles: ['user'],
+    assignedBuildings: ['building-001']
+  };
+}
+
 function setSession(user: User) {
   const session: AuthSession = {
     user,
@@ -63,6 +86,19 @@ function setSession(user: User) {
 
 export function subscribeToAuthState(listener: AuthStateListener): () => void {
   listeners.push(listener);
+
+  if (USE_FIREBASE) {
+    const unsubFirebase = onAuthStateChanged(auth, (fbUser) => {
+      const user = fbUser ? firebaseUserToUser(fbUser) : null;
+      listener(user);
+    });
+    return () => {
+      const index = listeners.indexOf(listener);
+      if (index > -1) listeners.splice(index, 1);
+      unsubFirebase();
+    };
+  }
+
   return () => {
     const index = listeners.indexOf(listener);
     if (index > -1) listeners.splice(index, 1);
@@ -70,6 +106,14 @@ export function subscribeToAuthState(listener: AuthStateListener): () => void {
 }
 
 export async function login(email: string, password: string): Promise<User> {
+  if (USE_FIREBASE) {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const user = firebaseUserToUser(cred.user);
+    notifyListeners(user);
+    return user;
+  }
+
+  // Mock login
   await new Promise(resolve => setTimeout(resolve, 500));
   const key = email.toLowerCase();
   const record = MOCK_USERS[key];
@@ -96,6 +140,15 @@ export async function login(email: string, password: string): Promise<User> {
 }
 
 export async function register(input: { displayName: string; email: string; password: string }): Promise<User> {
+  if (USE_FIREBASE) {
+    const cred = await createUserWithEmailAndPassword(auth, input.email, input.password);
+    await updateProfile(cred.user, { displayName: input.displayName });
+    const user = firebaseUserToUser({ ...cred.user, displayName: input.displayName });
+    notifyListeners(user);
+    return user;
+  }
+
+  // Mock register
   await new Promise(resolve => setTimeout(resolve, 500));
   const key = input.email.toLowerCase();
 
@@ -126,12 +179,22 @@ export async function register(input: { displayName: string; email: string; pass
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {
+  if (USE_FIREBASE) {
+    await sendPasswordResetEmail(auth, email);
+    return;
+  }
   await new Promise(resolve => setTimeout(resolve, 400));
-  // Mock only: in prod call Firebase reset API
   void email;
 }
 
 export async function updateCurrentUserProfile(input: { displayName: string }): Promise<User | null> {
+  if (USE_FIREBASE && auth.currentUser) {
+    await updateProfile(auth.currentUser, { displayName: input.displayName });
+    const user = firebaseUserToUser({ ...auth.currentUser, displayName: input.displayName });
+    notifyListeners(user);
+    return user;
+  }
+
   const current = await getCurrentUser();
   if (!current) return null;
 
@@ -148,12 +211,22 @@ export async function updateCurrentUserProfile(input: { displayName: string }): 
 }
 
 export async function logout(): Promise<void> {
+  if (USE_FIREBASE) {
+    await signOut(auth);
+    notifyListeners(null);
+    return;
+  }
   await new Promise(resolve => setTimeout(resolve, 250));
   localStorage.removeItem('mockAuthSession');
   notifyListeners(null);
 }
 
 export async function getCurrentUser(): Promise<User | null> {
+  if (USE_FIREBASE) {
+    const fbUser = auth.currentUser;
+    return fbUser ? firebaseUserToUser(fbUser) : null;
+  }
+
   const sessionJson = localStorage.getItem('mockAuthSession');
   if (!sessionJson) return null;
 
@@ -179,6 +252,7 @@ export async function hasRole(role: string): Promise<boolean> {
 }
 
 export async function refreshSession(): Promise<void> {
+  if (USE_FIREBASE) return;
   const sessionJson = localStorage.getItem('mockAuthSession');
   if (!sessionJson) return;
   const session: AuthSession = JSON.parse(sessionJson);

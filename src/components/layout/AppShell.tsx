@@ -13,7 +13,8 @@ const navItems = [
   { to: '/create-assessment', label: 'New Assessment' },
   { to: '/reports', label: 'Reports' },
   { to: '/profile', label: 'My Profile' },
-  { to: '/about', label: 'About Us' }
+  { to: '/about', label: 'About Us' },
+  { to: '/contact', label: 'Contact Us' }
 ];
 
 export const AppShell: React.FC<AppShellProps> = ({ title, children }) => {

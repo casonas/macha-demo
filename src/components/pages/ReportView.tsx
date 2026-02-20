@@ -43,7 +43,7 @@ export const ReportView: React.FC = () => {
     return (
       <AppShell title="Report">
         <div className="text-center py-16">
-          <p className="text-5xl mb-4">🔍</p>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <h2 className="text-xl font-bold text-slate-900">Report Not Found</h2>
           <p className="text-sm text-slate-500 mt-2">This assessment doesn't exist or hasn't been completed yet.</p>
           <button onClick={() => navigate('/reports')} className="mt-5 px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors">
@@ -76,7 +76,7 @@ export const ReportView: React.FC = () => {
               onClick={handlePrint}
               className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 transition-colors"
             >
-              📄 Print / Save PDF
+              Print / Save PDF
             </button>
           </div>
         </div>
@@ -90,10 +90,10 @@ export const ReportView: React.FC = () => {
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Security Assessment Report</p>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-2">{assessment.name}</h1>
                 {assessment.address && (
-                  <p className="text-slate-300 text-sm mt-2">📍 {assessment.address}</p>
+                  <p className="text-slate-300 text-sm mt-2">{assessment.address}</p>
                 )}
                 {assessment.buildingType && (
-                  <p className="text-slate-400 text-xs mt-1">🏢 {assessment.buildingType}</p>
+                  <p className="text-slate-400 text-xs mt-1">{assessment.buildingType}</p>
                 )}
                 <div className="flex flex-wrap gap-3 mt-4 text-xs text-slate-400">
                   <span>Report ID: {assessment.id}</span>
@@ -113,16 +113,16 @@ export const ReportView: React.FC = () => {
 
           {/* Score Overview */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 text-center">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Overall Score</p>
               <p className="text-4xl font-extrabold text-slate-900 mt-2">{assessment.score ?? 0}%</p>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 text-center">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Risk Level</p>
               <p className={`text-lg font-extrabold mt-2 ${risk.color}`}>{risk.label}</p>
               <span className={`inline-block mt-2 status-pill border ${risk.bg} ${risk.color} ${risk.border}`}>{risk.label}</span>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 text-center">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Questions Answered</p>
               <p className="text-4xl font-extrabold text-slate-900 mt-2">{answered}</p>
             </div>
@@ -131,7 +131,7 @@ export const ReportView: React.FC = () => {
           {/* Executive Summary */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 print-section">
             <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              📝 Executive Summary
+              Executive Summary
             </h3>
             <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
               <pre className="whitespace-pre-wrap text-sm text-slate-700 font-sans leading-relaxed">{summary}</pre>
@@ -141,7 +141,7 @@ export const ReportView: React.FC = () => {
           {/* Detailed Responses */}
           {responseEntries.length > 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 print-section">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">📋 Detailed Responses</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Detailed Responses</h3>
               <div className="divide-y divide-slate-100">
                 {responseEntries.map(([key, value]) => {
                   const comment = assessment.responses[`${key}Comment`];
@@ -149,7 +149,7 @@ export const ReportView: React.FC = () => {
                     <div key={key} className="py-3">
                       <p className="text-sm font-semibold text-slate-700">{key}</p>
                       <p className="text-sm text-slate-900 mt-1">
-                        {typeof value === 'boolean' ? (value ? '✅ Yes' : '❌ No') : String(value)}
+                        {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
                       </p>
                       {comment && (
                         <p className="text-xs text-slate-500 mt-1 italic">Note: {comment}</p>

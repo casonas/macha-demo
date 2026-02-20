@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import AppShell from '../layout/AppShell';
-import { listAssessments } from '../../services/data';
+import { listAssessmentsByUser } from '../../services/data';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import ScoreGauge from '../dashboard/ScoreGauge';
@@ -9,7 +9,7 @@ import './pages.css';
 export const HomeScreen: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const assessments = useMemo(() => listAssessments(), []);
+  const assessments = useMemo(() => user ? listAssessmentsByUser(user.id) : [], [user]);
 
   const completed = assessments.filter(a => a.status === 'completed').length;
   const inProgress = assessments.filter(a => a.status !== 'completed').length;
