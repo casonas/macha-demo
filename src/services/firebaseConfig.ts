@@ -1,7 +1,9 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 
-const firebaseConfig = {
+// Client-side Firebase config — these keys are designed to be public per Firebase docs.
+// Security is enforced by Firestore Security Rules, not by keeping these keys secret.
+export const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY || 'AIzaSyAOfLCpcP-Lq3QXUhrGNbeUdys-CsCPvrM',
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || 'macha-demo.firebaseapp.com',
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || 'macha-demo',
