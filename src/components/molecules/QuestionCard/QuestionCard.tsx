@@ -54,16 +54,36 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     const remaining = MAX_PHOTOS - photos.length;
     const files = Array.from(e.target.files).slice(0, remaining);
 
+    const rejected: string[] = [];
+    const validFiles: File[] = [];
     files.forEach((file) => {
-      if (!ACCEPTED_TYPES.includes(file.type)) return;
-      if (file.size > MAX_FILE_SIZE_BYTES) return;
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        rejected.push(`${file.name}: unsupported type`);
+      } else if (file.size > MAX_FILE_SIZE_BYTES) {
+        rejected.push(`${file.name}: exceeds 5 MB`);
+      } else {
+        validFiles.push(file);
+      }
+    });
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result as string;
-        onPhotosChange([...photos, { name: file.name, dataUrl }]);
-      };
-      reader.readAsDataURL(file);
+    if (rejected.length > 0) {
+      alert(`Some files were not added:\n${rejected.join('\n')}`);
+    }
+
+    // Read all valid files, then update photos once to avoid race conditions
+    Promise.all(
+      validFiles.map(
+        (file) =>
+          new Promise<PhotoAttachment>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve({ name: file.name, dataUrl: reader.result as string });
+            reader.readAsDataURL(file);
+          })
+      )
+    ).then((newPhotos) => {
+      if (newPhotos.length > 0) {
+        onPhotosChange([...photos, ...newPhotos]);
+      }
     });
 
     // Reset so the same file can be re-selected

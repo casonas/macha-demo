@@ -6,6 +6,12 @@ import { Button } from '../atoms/Button';
 import { useAuth } from '../../hooks/useAuth';
 import './auth-pages.css';
 
+const US_STATES = [
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY',
+  'LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH',
+  'OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'
+];
+
 export const CreateAccount: React.FC = () => {
   const [form, setForm] = useState({
     fullName: '',
@@ -47,12 +53,6 @@ export const CreateAccount: React.FC = () => {
     }
   };
 
-  const US_STATES = [
-    '', 'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY',
-    'LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH',
-    'OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'
-  ];
-
   return (
     <div className="auth-page">
       <Card className="auth-card auth-card--wide" padding="lg" shadow="lg">
@@ -88,7 +88,7 @@ export const CreateAccount: React.FC = () => {
                 <label className="input__label" htmlFor="state-select">State</label>
                 <select id="state-select" className="create-account__select" value={form.state} onChange={update('state')}>
                   <option value="">Select</option>
-                  {US_STATES.filter(Boolean).map(s => <option key={s} value={s}>{s}</option>)}
+                  {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <Input label="Zip Code" value={form.zipCode} onChange={update('zipCode')} placeholder="62704" fullWidth />
