@@ -21,6 +21,8 @@
   font-size: 1rem;
   transition: all 0.2s ease;
   background: white;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .input__field:focus {
