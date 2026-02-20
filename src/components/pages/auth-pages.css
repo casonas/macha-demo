@@ -36,3 +36,104 @@
   font-weight: 600; 
   margin: 0; 
 }
+
+/* Comprehensive Create Account */
+.auth-card--wide {
+  width: min(94vw, 620px);
+}
+
+.create-account__header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.create-account__logo {
+  width: 60px;
+  height: 48px;
+  margin: 0 auto 0.6rem;
+  display: block;
+}
+
+.create-account__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #050805;
+  margin: 0 0 0.35rem;
+}
+
+.create-account__subtitle {
+  font-size: 0.92rem;
+  color: #4a5d4a;
+  margin: 0;
+}
+
+.create-account__error {
+  padding: 0.65rem 0.9rem;
+  background: #fef2f2;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.create-account__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.create-account__fieldset {
+  border: 1px solid #e2e8e2;
+  border-radius: 10px;
+  padding: 1rem 1.1rem 1.1rem;
+  margin: 0;
+}
+
+.create-account__legend {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #228b22;
+  padding: 0 0.4rem;
+}
+
+.create-account__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.create-account__row--3 {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+.create-account__select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.create-account__select {
+  border: 1px solid #c2ccbc;
+  border-radius: 0.6rem;
+  padding: 0.62rem 0.7rem;
+  font-size: 0.92rem;
+  background: #fff;
+  color: #334155;
+  height: 42px;
+}
+
+.create-account__hint {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0.3rem 0 0;
+}
+
+@media (max-width: 600px) {
+  .create-account__row,
+  .create-account__row--3 {
+    grid-template-columns: 1fr;
+  }
+}
