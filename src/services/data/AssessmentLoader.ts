@@ -217,10 +217,14 @@ const cached = getCached<AssessmentRegistry>(cacheKey);
 if (cached) return cached;
 
 try {
-const data =
+let data =
 DATA_PROVIDER === 'firebase'
 ? await loadAssessmentRegistryFirebase()
 : await loadAssessmentRegistryLocal();
+
+if (DATA_PROVIDER === 'firebase' && data.assessments.length === 0) {
+data = await loadAssessmentRegistryLocal();
+}
 
 setCached(cacheKey, data);
 return data;
@@ -236,10 +240,14 @@ const cached = getCached<Assessment>(cacheKey);
 if (cached) return cached;
 
 try {
-const data =
+let data =
 DATA_PROVIDER === 'firebase'
 ? await loadAssessmentFirebase(assessmentId)
 : await loadAssessmentLocal(assessmentId);
+
+if (DATA_PROVIDER === 'firebase' && !data) {
+data = await loadAssessmentLocal(assessmentId);
+}
 
 if (data) setCached(cacheKey, data);
 return data;
