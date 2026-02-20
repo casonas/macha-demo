@@ -8,7 +8,6 @@ import { UserProfile } from './components/pages/UserProfile';
 import { CreateAccount } from './components/pages/CreateAccount';
 import { ForgotPassword } from './components/pages/ForgotPassword';
 import { PastAssessments } from './components/pages/PastAssessments';
-import { PricingModels } from './components/pages/PricingModels';
 import { AboutUs } from './components/pages/AboutUs';
 import { CreateAssessment } from './components/pages/CreateAssessment';
 import { ReportView } from './components/pages/ReportView';
@@ -34,7 +33,6 @@ function App() {
         <Route path="/report/:id" element={<Protected><ReportView /></Protected>} />
         <Route path="/create-assessment" element={<Protected><CreateAssessment /></Protected>} />
         <Route path="/profile" element={<Protected><UserProfile /></Protected>} />
-        <Route path="/pricing" element={<Protected><PricingModels /></Protected>} />
         <Route path="/about" element={<Protected><AboutUs /></Protected>} />
 
         {/* Redirects for old routes */}

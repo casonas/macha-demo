@@ -13,7 +13,6 @@ const navItems = [
   { to: '/create-assessment', label: 'New Assessment' },
   { to: '/reports', label: 'Reports' },
   { to: '/profile', label: 'My Profile' },
-  { to: '/pricing', label: 'Pricing' },
   { to: '/about', label: 'About Us' }
 ];
 
