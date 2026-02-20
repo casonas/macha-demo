@@ -155,3 +155,11 @@
   color: #ef4444;
   margin-top: 0.5rem;
 }
+
+/* Search highlight */
+.question-card__highlight {
+  background: #fef08a;
+  color: #713f12;
+  padding: 0.05em 0.15em;
+  border-radius: 3px;
+}

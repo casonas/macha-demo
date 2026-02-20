@@ -9,6 +9,16 @@ interface QuestionCardProps {
   onChange: (value: any) => void;
   onCommentChange: (comment: string) => void;
   error?: string;
+  searchQuery?: string;
+}
+
+function highlightText(text: string, query: string): React.ReactNode {
+  if (!query || !query.trim()) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const parts = text.split(regex);
+  return parts.map((part, i) =>
+    regex.test(part) ? <mark key={i} className="question-card__highlight">{part}</mark> : part
+  );
 }
 
 /**
@@ -21,7 +31,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   comment,
   onChange,
   onCommentChange,
-  error
+  error,
+  searchQuery
 }) => {
   const renderInput = () => {
     switch (question.type) {
@@ -93,7 +104,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div className={`question-card ${error ? 'question-card--error' : ''}`}>
       <div className="question-card__header">
         <h3 className="question-card__text">
-          {question.text}
+          {highlightText(question.text, searchQuery || '')}
           {question.required && <span className="question-card__required">*</span>}
         </h3>
         {question.helpText && (

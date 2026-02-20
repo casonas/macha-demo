@@ -30,8 +30,10 @@ const [activeCategory, setActiveCategory] = useState<number>(0);
 const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 const [isSubmitting, setIsSubmitting] = useState(false);
 const [query, setQuery] = useState('');
+const [activeQuery, setActiveQuery] = useState('');
 const [selectedSubsection, setSelectedSubsection] = useState('All');
 const chipsRef = useRef<HTMLDivElement | null>(null);
+const searchInputRef = useRef<HTMLInputElement | null>(null);
 
 const validateCategory = useCallback(
 (category: Category): boolean => {
@@ -138,28 +140,56 @@ return (
 
 const currentCategory = assessment.categories[activeCategory];
 if (!currentCategory) return <></>;
+
+const isSearching = activeQuery.trim().length > 0;
+
+const questionMatchesSearch = (q: Question): boolean => {
+if (!activeQuery.trim()) return true;
+const needle = activeQuery.toLowerCase();
+return q.text.toLowerCase().includes(needle) || q.id.toLowerCase().includes(needle);
+};
+
+// When searching, gather results from ALL categories; otherwise use the current one
+const categoriesToShow = isSearching ? assessment.categories : [currentCategory];
+
+const allVisibleGroups: { categoryTitle: string; name: string; questions: Question[] }[] = [];
+categoriesToShow.forEach((cat) => {
+const grouped: GroupedQuestions = cat.questions.reduce((acc, q) => {
+  const name = q.helpText?.replace('Section: ', '').trim() || 'General';
+  if (!acc[name]) acc[name] = [];
+  acc[name].push(q);
+  return acc;
+}, {} as GroupedQuestions);
+
+const names = Object.keys(grouped);
+names
+  .filter((name) => isSearching || selectedSubsection === 'All' || name === selectedSubsection)
+  .forEach((name) => {
+    const questions = grouped[name].filter(questionMatchesSearch);
+    if (questions.length > 0) {
+      allVisibleGroups.push({ categoryTitle: cat.title, name, questions });
+    }
+  });
+});
+
+// Subsection names for chips (only from current category when not searching)
 const groupedQuestions: GroupedQuestions = currentCategory.questions.reduce((acc, q) => {
 const name = q.helpText?.replace('Section: ', '').trim() || 'General';
 if (!acc[name]) acc[name] = [];
 acc[name].push(q);
 return acc;
 }, {} as GroupedQuestions);
-
 const subsectionNames = Object.keys(groupedQuestions);
 
-const questionMatchesSearch = (q: Question): boolean => {
-if (!query.trim()) return true;
-const needle = query.toLowerCase();
-return q.text.toLowerCase().includes(needle) || q.id.toLowerCase().includes(needle);
+const handleSearch = () => {
+setActiveQuery(query);
 };
 
-const visibleGroups = subsectionNames
-.filter((name) => selectedSubsection === 'All' || name === selectedSubsection)
-.map((name) => ({
-name,
-questions: groupedQuestions[name].filter(questionMatchesSearch)
-}))
-.filter((group) => group.questions.length > 0);
+const clearSearch = () => {
+setQuery('');
+setActiveQuery('');
+searchInputRef.current?.focus();
+};
 
 const totalQuestions = assessment.categories.reduce((sum, c) => sum + c.questions.length, 0);
 const answeredCount = assessment.categories
@@ -254,11 +284,24 @@ setSelectedSubsection('All');
 
 <label className="toolbar-field toolbar-field--grow">
 <span>Search questions</span>
+<div className="toolbar-search">
 <input
+ref={searchInputRef}
 value={query}
 onChange={(e) => setQuery(e.target.value)}
+onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
 placeholder="Type keyword (ex: keypad, backup, camera)"
 />
+{activeQuery && (
+<button type="button" className="toolbar-search__clear" onClick={clearSearch} aria-label="Clear search">
+✕
+</button>
+)}
+<button type="button" className="toolbar-search__btn" onClick={handleSearch}>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+Search
+</button>
+</div>
 </label>
 </div>
 
@@ -308,19 +351,24 @@ block: 'nearest'
 
 <Card className="assessment-form__category" padding="lg">
 <div className="category__header">
-<h2 className="category__title">{currentCategory.title}</h2>
-{currentCategory.description && (
+<h2 className="category__title">{isSearching ? `Search results for "${activeQuery}"` : currentCategory.title}</h2>
+{!isSearching && currentCategory.description && (
 <p className="category__description">{currentCategory.description}</p>
+)}
+{isSearching && (
+<p className="category__description">
+{allVisibleGroups.reduce((sum, g) => sum + g.questions.length, 0)} matching questions across all sections
+</p>
 )}
 </div>
 
 <div className="category__questions">
-{visibleGroups.length === 0 && <p>No questions match your filters in this section.</p>}
+{allVisibleGroups.length === 0 && <p>No questions match your filters{isSearching ? ' across any section' : ' in this section'}.</p>}
 
-{visibleGroups.map((group) => (
-<section key={group.name} className="subsection-group">
+{allVisibleGroups.map((group, groupIdx) => (
+<section key={`${group.categoryTitle}-${group.name}-${groupIdx}`} className="subsection-group">
 <div className="subsection-group__header">
-<h3>{group.name}</h3>
+<h3>{isSearching ? `${group.categoryTitle} › ${group.name}` : group.name}</h3>
 <span>{group.questions.length} questions</span>
 </div>
 
@@ -334,6 +382,7 @@ comment={getComment(question.id)}
 onChange={(value) => updateResponse(question.id, value)}
 onCommentChange={(comment) => updateComment(question.id, comment)}
 error={validationErrors[question.id]}
+searchQuery={activeQuery}
 />
 </div>
 ))}
