@@ -20,7 +20,7 @@ export const CreateAssessment: React.FC = () => {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [buildingType, setBuildingType] = useState('');
-  const [assessmentId] = useState('physical-security');
+  const [assessmentId] = useState('school-security-v1');
   const navigate = useNavigate();
   const { user } = useAuth();
 

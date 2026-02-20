@@ -26,6 +26,30 @@ The app opens at **http://localhost:3000**.
 | `npm run build` | Create a production build          |
 | `npm test`      | Run tests                          |
 
+## Deploying to Firebase
+
+```bash
+# Install Firebase CLI (one-time)
+npm install -g firebase-tools
+
+# Login to Firebase
+firebase login
+
+# Deploy Firestore rules only
+firebase deploy --only firestore:rules
+
+# Deploy Firestore rules + indexes
+firebase deploy --only firestore
+
+# Build and deploy everything (rules + hosting)
+npm run build
+firebase deploy
+
+# Deploy hosting only (after building)
+npm run build
+firebase deploy --only hosting
+```
+
 ## Tech Stack
 
 - React 18 + TypeScript

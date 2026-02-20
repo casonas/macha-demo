@@ -2,12 +2,15 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AssessmentForm } from '../organisms/AssessmentForm';
 import AppShell from '../layout/AppShell';
-import { completeAssessment, getActiveAssessmentId, saveAssessmentProgress } from '../../services/data';
+import { completeAssessment, getActiveAssessmentId, getAssessmentById, saveAssessmentProgress } from '../../services/data';
 import './AssessmentDemo.css';
 
 export const AssessmentDemo: React.FC = () => {
 const [params] = useSearchParams();
 const recordId = params.get('id') || getActiveAssessmentId() || 'AS-LOCAL';
+const record = getAssessmentById(recordId);
+const assessmentId = record?.assessmentId || 'school-security-v1';
+const buildingId = record?.buildingId || 'building-001';
 
 const handleSubmit = async (responses: Record<string, any>) => {
 completeAssessment(recordId, responses);
@@ -23,8 +26,8 @@ return (
 <AppShell title="Assessment Workspace">
 <div className="assessment-demo">
 <AssessmentForm
-assessmentId="school-security-v1"
-buildingId="building-001"
+assessmentId={assessmentId}
+buildingId={buildingId}
 onSubmit={handleSubmit}
 onSave={handleSave}
 />
