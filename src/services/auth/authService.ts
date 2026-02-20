@@ -15,7 +15,7 @@ import {
 } from 'firebase/auth';
 import { getFirebaseAuth } from '../firebaseConfig';
 
-const USE_FIREBASE = process.env.REACT_APP_DATA_PROVIDER === 'firebase';
+const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
 
 export interface User {
   id: string;
