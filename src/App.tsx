@@ -11,6 +11,7 @@ import { PastAssessments } from './components/pages/PastAssessments';
 import { AboutUs } from './components/pages/AboutUs';
 import { CreateAssessment } from './components/pages/CreateAssessment';
 import { ReportView } from './components/pages/ReportView';
+import { ContactUs } from './components/pages/ContactUs';
 import './App.css';
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -34,6 +35,7 @@ function App() {
         <Route path="/create-assessment" element={<Protected><CreateAssessment /></Protected>} />
         <Route path="/profile" element={<Protected><UserProfile /></Protected>} />
         <Route path="/about" element={<Protected><AboutUs /></Protected>} />
+        <Route path="/contact" element={<Protected><ContactUs /></Protected>} />
 
         {/* Redirects for old routes */}
         <Route path="/past-assessments" element={<Navigate to="/reports" replace />} />

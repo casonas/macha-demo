@@ -12,6 +12,7 @@ export interface AssessmentRecord {
   responses: Record<string, any>;
   address?: string;
   buildingType?: string;
+  userId?: string;
 }
 
 export interface UserProfileRecord {
@@ -46,6 +47,15 @@ export function listAssessments(): AssessmentRecord[] {
   return load<AssessmentRecord[]>(ASSESS_KEY, []).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
+export function listAssessmentsByUser(userId: string): AssessmentRecord[] {
+  return listAssessments().filter(a => a.userId === userId);
+}
+
+export function deleteAssessment(id: string): void {
+  const all = listAssessments().filter(a => a.id !== id);
+  save(ASSESS_KEY, all);
+}
+
 export function upsertAssessment(record: AssessmentRecord) {
   const all = listAssessments();
   const idx = all.findIndex(x => x.id === record.id);
@@ -54,7 +64,7 @@ export function upsertAssessment(record: AssessmentRecord) {
   save(ASSESS_KEY, all);
 }
 
-export function createAssessment(input: { name: string; buildingId: string; assessmentId: string; address?: string; buildingType?: string }): AssessmentRecord {
+export function createAssessment(input: { name: string; buildingId: string; assessmentId: string; address?: string; buildingType?: string; userId?: string }): AssessmentRecord {
   const id = `AS-${Date.now()}`;
   const rec: AssessmentRecord = {
     id,
@@ -66,7 +76,8 @@ export function createAssessment(input: { name: string; buildingId: string; asse
     updatedAt: now(),
     responses: {},
     address: input.address,
-    buildingType: input.buildingType
+    buildingType: input.buildingType,
+    userId: input.userId
   };
   upsertAssessment(rec);
   setActiveAssessmentId(id);

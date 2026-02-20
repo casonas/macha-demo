@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AppShell from '../layout/AppShell';
 import { useNavigate } from 'react-router-dom';
 import { createAssessment } from '../../services/data';
+import { useAuth } from '../../hooks/useAuth';
 import './pages.css';
 
 const buildingTypes = [
@@ -21,6 +22,7 @@ export const CreateAssessment: React.FC = () => {
   const [buildingType, setBuildingType] = useState('');
   const [assessmentId] = useState('physical-security');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const isValid = name.trim() && address.trim() && buildingType;
 
@@ -31,7 +33,8 @@ export const CreateAssessment: React.FC = () => {
       buildingId: buildingType.toLowerCase().replace(/[\s/]+/g, '-'),
       assessmentId,
       address,
-      buildingType
+      buildingType,
+      userId: user?.id
     });
     navigate(`/assessment?id=${encodeURIComponent(rec.id)}`);
   };
