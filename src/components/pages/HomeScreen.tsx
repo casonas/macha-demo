@@ -3,6 +3,7 @@ import AppShell from '../layout/AppShell';
 import { listAssessmentsByUser } from '../../services/data';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { useAssessment } from '../../hooks/useAssessment';
 import ScoreGauge from '../dashboard/ScoreGauge';
 import './pages.css';
 
@@ -25,28 +26,44 @@ export const HomeScreen: React.FC = () => {
   const lastAssessment = assessments[0];
   const firstName = (user?.displayName || 'there').split(' ')[0];
 
+  // Load the assessment definition to get total question count for percent complete
+  const { assessment: assessmentDef } = useAssessment(lastAssessment?.assessmentId ?? null);
+  const totalQuestions = useMemo(() => {
+    if (!assessmentDef) return 0;
+    return assessmentDef.categories.reduce((sum, c) => sum + c.questions.length, 0);
+  }, [assessmentDef]);
+
+  const answeredCount = useMemo(() => {
+    if (!lastAssessment?.responses) return 0;
+    return Object.entries(lastAssessment.responses).filter(
+      ([key, v]) => !key.endsWith('Comment') && v !== '' && v !== null && v !== undefined
+    ).length;
+  }, [lastAssessment]);
+
+  const percentComplete = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+
   return (
     <AppShell title="Dashboard">
       <div className="space-y-6 sm:space-y-8 flex flex-col items-center">
         {/* Welcome Hero */}
-        <div className="relative overflow-hidden rounded-2xl p-10 sm:p-14 text-white text-center w-full flex flex-col items-center justify-center" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
+        <div className="relative overflow-hidden rounded-2xl p-8 sm:p-12 pb-12 sm:pb-16 text-white text-center w-full flex flex-col items-center justify-center" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
           <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
-          <div className="relative z-10 w-full flex flex-col items-center text-center gap-5">
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mt-3">Welcome back, {firstName}</h1>
+          <div className="relative z-10 w-full flex flex-col items-center text-center gap-5 pt-6 pb-2">
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mt-4">Welcome back, {firstName}</h1>
             <p className="text-slate-300 text-sm sm:text-lg text-center max-w-xl">
               Your security assessment platform is ready. Start a new inspection or review your latest reports.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <button
                 onClick={() => navigate('/create-assessment')}
-                className="px-6 py-3.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg whitespace-nowrap"
+                className="px-8 py-3.5 bg-white text-emerald-900 rounded-xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg"
               >
                 + New Assessment
               </button>
               <button
                 onClick={() => navigate('/reports')}
-                className="px-6 py-3.5 border border-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all whitespace-nowrap"
+                className="px-8 py-3.5 border border-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all"
               >
                 View Reports
               </button>
@@ -132,6 +149,25 @@ export const HomeScreen: React.FC = () => {
                       </span>
                     )}
                   </div>
+                  {totalQuestions > 0 && (
+                    <div className="mt-4 w-full max-w-xs mx-auto">
+                      <div className="flex justify-between text-xs text-slate-500 mb-1">
+                        <span>{answeredCount} of {totalQuestions} questions</span>
+                        <span className="font-semibold text-slate-700">{percentComplete}%</span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${percentComplete}%`,
+                            background: percentComplete === 100
+                              ? 'linear-gradient(90deg, #16a34a 0%, #14532d 100%)'
+                              : 'linear-gradient(90deg, #228b22 0%, #14532d 100%)'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <p className="text-xs text-slate-400 mt-3">
                     Updated {new Date(lastAssessment.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
@@ -152,7 +188,7 @@ export const HomeScreen: React.FC = () => {
                 <p className="text-sm text-slate-500 mt-1">Create your first security assessment to get started.</p>
                 <button
                   onClick={() => navigate('/create-assessment')}
-                  className="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors whitespace-nowrap"
+                  className="mt-4 px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors"
                 >
                   Start First Assessment
                 </button>
@@ -161,7 +197,7 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center">
             <h3 className="text-lg font-bold text-slate-900 mb-6">Quick Actions</h3>
             <div className="space-y-3 w-full">
               {[
@@ -198,7 +234,7 @@ export const HomeScreen: React.FC = () => {
               <button onClick={() => navigate('/reports')} className="text-sm font-semibold text-emerald-600 hover:text-emerald-700">View All →</button>
             </div>
             <div className="divide-y divide-slate-100">
-              {assessments.slice(0, 5).map((a) => (
+              {assessments.map((a) => (
                 <div key={a.id} className="flex items-center justify-between py-3 group">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-600 flex-shrink-0">

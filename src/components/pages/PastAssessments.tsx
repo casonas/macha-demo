@@ -74,7 +74,7 @@ export const PastAssessments: React.FC = () => {
                           {new Date(r.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
                         <span className="status-pill border bg-emerald-100 text-emerald-700 border-emerald-200 font-bold">
                           {r.score ?? 0}%
                         </span>
@@ -108,7 +108,7 @@ export const PastAssessments: React.FC = () => {
                           Started {new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
                         <span className="status-pill border bg-amber-100 text-amber-700 border-amber-200">
                           In Progress
                         </span>
