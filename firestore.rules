@@ -4,8 +4,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Assessments: only the creator can read/write their own
     match /assessments/{assessmentId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
     }
 
     // User profiles: users can only access their own profile

@@ -13,7 +13,7 @@ import {
   onAuthStateChanged,
   type User as FirebaseUser
 } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
+import { getFirebaseAuth } from '../firebaseConfig';
 
 const USE_FIREBASE = process.env.REACT_APP_DATA_PROVIDER === 'firebase';
 
@@ -88,7 +88,7 @@ export function subscribeToAuthState(listener: AuthStateListener): () => void {
   listeners.push(listener);
 
   if (USE_FIREBASE) {
-    const unsubFirebase = onAuthStateChanged(auth, (fbUser) => {
+    const unsubFirebase = onAuthStateChanged(getFirebaseAuth(), (fbUser) => {
       const user = fbUser ? firebaseUserToUser(fbUser) : null;
       listener(user);
     });
@@ -107,7 +107,7 @@ export function subscribeToAuthState(listener: AuthStateListener): () => void {
 
 export async function login(email: string, password: string): Promise<User> {
   if (USE_FIREBASE) {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
     const user = firebaseUserToUser(cred.user);
     notifyListeners(user);
     return user;
@@ -141,7 +141,7 @@ export async function login(email: string, password: string): Promise<User> {
 
 export async function register(input: { displayName: string; email: string; password: string }): Promise<User> {
   if (USE_FIREBASE) {
-    const cred = await createUserWithEmailAndPassword(auth, input.email, input.password);
+    const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), input.email, input.password);
     await updateProfile(cred.user, { displayName: input.displayName });
     const user = firebaseUserToUser({ ...cred.user, displayName: input.displayName });
     notifyListeners(user);
@@ -180,7 +180,7 @@ export async function register(input: { displayName: string; email: string; pass
 
 export async function requestPasswordReset(email: string): Promise<void> {
   if (USE_FIREBASE) {
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(getFirebaseAuth(), email);
     return;
   }
   await new Promise(resolve => setTimeout(resolve, 400));
@@ -188,11 +188,14 @@ export async function requestPasswordReset(email: string): Promise<void> {
 }
 
 export async function updateCurrentUserProfile(input: { displayName: string }): Promise<User | null> {
-  if (USE_FIREBASE && auth.currentUser) {
-    await updateProfile(auth.currentUser, { displayName: input.displayName });
-    const user = firebaseUserToUser({ ...auth.currentUser, displayName: input.displayName });
-    notifyListeners(user);
-    return user;
+  if (USE_FIREBASE) {
+    const fbUser = getFirebaseAuth().currentUser;
+    if (fbUser) {
+      await updateProfile(fbUser, { displayName: input.displayName });
+      const user = firebaseUserToUser({ ...fbUser, displayName: input.displayName });
+      notifyListeners(user);
+      return user;
+    }
   }
 
   const current = await getCurrentUser();
@@ -212,7 +215,7 @@ export async function updateCurrentUserProfile(input: { displayName: string }): 
 
 export async function logout(): Promise<void> {
   if (USE_FIREBASE) {
-    await signOut(auth);
+    await signOut(getFirebaseAuth());
     notifyListeners(null);
     return;
   }
@@ -223,7 +226,7 @@ export async function logout(): Promise<void> {
 
 export async function getCurrentUser(): Promise<User | null> {
   if (USE_FIREBASE) {
-    const fbUser = auth.currentUser;
+    const fbUser = getFirebaseAuth().currentUser;
     return fbUser ? firebaseUserToUser(fbUser) : null;
   }
 
