@@ -222,9 +222,14 @@ DATA_PROVIDER === 'firebase'
 ? await loadAssessmentRegistryFirebase()
 : await loadAssessmentRegistryLocal();
 
-if (DATA_PROVIDER === 'firebase' && data.assessments.length === 0) {
-data = await loadAssessmentRegistryLocal();
-}
+  if (DATA_PROVIDER === 'firebase' && (!data || !data.assessments || !Array.isArray(data.assessments))) {
+  let registryIssue = 'unknown';
+  if (!data) registryIssue = 'missing';
+  else if (!data.assessments) registryIssue = 'missing-assessments';
+  else if (!Array.isArray(data.assessments)) registryIssue = 'invalid-structure';
+  console.warn(`Firebase registry ${registryIssue}; using bundled local registry to ensure default assessments are available.`);
+  data = await loadAssessmentRegistryLocal();
+  }
 
 setCached(cacheKey, data);
 return data;
@@ -246,6 +251,7 @@ DATA_PROVIDER === 'firebase'
 : await loadAssessmentLocal(assessmentId);
 
 if (DATA_PROVIDER === 'firebase' && !data) {
+console.warn(`Assessment ${assessmentId} missing in Firebase; loading local file instead.`);
 data = await loadAssessmentLocal(assessmentId);
 }
 
