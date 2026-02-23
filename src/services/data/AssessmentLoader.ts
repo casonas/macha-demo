@@ -21,9 +21,10 @@ import { firebaseConfig } from '../firebaseConfig';
 const DATA_BASE_PATH = '/data';
 const DATA_PROVIDER = process.env.REACT_APP_DATA_PROVIDER || 'firebase';
 
-// Simple in-memory cache
+// Two-tier cache: in-memory + localStorage for persistence across page reloads
 const cache = new Map<string, any>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 60 * 60 * 1000; // 60 minutes (reduced Firestore reads)
+const LS_CACHE_PREFIX = 'macha.assessmentCache.';
 
 interface CacheEntry<T> {
 data: T;
@@ -31,19 +32,38 @@ timestamp: number;
 }
 
 function getCached<T>(key: string): T | null {
+// Check in-memory cache first
 const entry = cache.get(key) as CacheEntry<T> | undefined;
-if (!entry) return null;
+if (entry) {
+  if (Date.now() - entry.timestamp > CACHE_DURATION) {
+    cache.delete(key);
+  } else {
+    return entry.data;
+  }
+}
 
-if (Date.now() - entry.timestamp > CACHE_DURATION) {
-cache.delete(key);
+// Fall back to localStorage
+try {
+  const stored = localStorage.getItem(LS_CACHE_PREFIX + key);
+  if (stored) {
+    const parsed = JSON.parse(stored) as CacheEntry<T>;
+    if (Date.now() - parsed.timestamp <= CACHE_DURATION) {
+      cache.set(key, parsed); // Promote to in-memory
+      return parsed.data;
+    }
+    localStorage.removeItem(LS_CACHE_PREFIX + key);
+  }
+} catch { /* ignore parse errors */ }
+
 return null;
 }
 
-return entry.data;
-}
-
 function setCached<T>(key: string, data: T): void {
-cache.set(key, { data, timestamp: Date.now() });
+const entry: CacheEntry<T> = { data, timestamp: Date.now() };
+cache.set(key, entry);
+try {
+  localStorage.setItem(LS_CACHE_PREFIX + key, JSON.stringify(entry));
+} catch { /* ignore quota errors */ }
 }
 
 /** ---------- Firebase Helpers ---------- */
@@ -254,4 +274,12 @@ await Promise.all(assessmentIds.map((id) => loadAssessment(id)));
 
 export function clearAssessmentCache(): void {
 cache.clear();
+try {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(LS_CACHE_PREFIX)) keysToRemove.push(key);
+  }
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+} catch { /* ignore */ }
 }

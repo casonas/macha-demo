@@ -206,12 +206,19 @@ export async function loginWithGoogle(): Promise<User> {
   if (!USE_FIREBASE) {
     throw new Error('Google Sign-In is only available with Firebase.');
   }
-  const provider = new GoogleAuthProvider();
-  const cred = await signInWithPopup(getFirebaseAuth(), provider);
-  await saveUserProfileToFirestore(cred.user);
-  const user = firebaseUserToUser(cred.user);
-  notifyListeners(user);
-  return user;
+  try {
+    const provider = new GoogleAuthProvider();
+    const cred = await signInWithPopup(getFirebaseAuth(), provider);
+    await saveUserProfileToFirestore(cred.user);
+    const user = firebaseUserToUser(cred.user);
+    notifyListeners(user);
+    return user;
+  } catch (err: any) {
+    if (err?.code === 'auth/multi-factor-auth-required') {
+      throw new MfaRequiredError(err.resolver, null);
+    }
+    throw err;
+  }
 }
 
 export async function register(input: { displayName: string; email: string; password: string; phone?: string; organization?: string; address?: string }): Promise<User> {

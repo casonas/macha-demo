@@ -108,8 +108,25 @@ export const LoginMock: React.FC = () => {
     try {
       await loginWithGoogle();
       navigate(from, { replace: true });
-    } catch {
-      // Error is handled by useAuth hook
+    } catch (err) {
+      if (err instanceof MfaRequiredError) {
+        setMfaResolver(err.resolver);
+        setMfaPendingUser(err.pendingUser);
+        setMfaError('');
+        setMfaCode('');
+        setMfaStep(true);
+
+        try {
+          setMfaLoading(true);
+          const vid = await startMfaSignIn(err.resolver);
+          setMfaVerificationId(vid);
+        } catch (sendErr) {
+          setMfaError(sendErr instanceof Error ? sendErr.message : 'Failed to send verification code');
+        } finally {
+          setMfaLoading(false);
+        }
+      }
+      // Other errors handled by useAuth hook
     }
   };
 

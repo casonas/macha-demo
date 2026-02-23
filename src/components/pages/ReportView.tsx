@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AppShell from '../layout/AppShell';
 import { getAssessmentById } from '../../services/data';
 import { useAuth } from '../../hooks/useAuth';
+import { useAssessment } from '../../hooks/useAssessment';
 import './pages.css';
 
 function getRiskLevel(score: number) {
@@ -34,6 +35,22 @@ export const ReportView: React.FC = () => {
     if (record && user && record.userId && record.userId !== user.id) return null;
     return record;
   }, [id, user]);
+
+  // Load the assessment definition to get full question text
+  const { assessment: assessmentDef } = useAssessment(assessment?.assessmentId ?? null);
+
+  // Build a map from question ID to full question text
+  const questionTextMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    if (assessmentDef) {
+      assessmentDef.categories.forEach(cat => {
+        cat.questions.forEach(q => {
+          map[q.id] = q.text;
+        });
+      });
+    }
+    return map;
+  }, [assessmentDef]);
 
   if (!assessment) return null;
 
@@ -176,7 +193,7 @@ export const ReportView: React.FC = () => {
                         <div key={key} className="report-finding-row">
                           <span className="report-finding-row__bullet">■</span>
                           <div>
-                            <p className="report-finding-row__title">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                            <p className="report-finding-row__title">{questionTextMap[key] || key}</p>
                             {comment && <p className="report-finding-row__comment">{comment}</p>}
                           </div>
                         </div>
@@ -207,7 +224,7 @@ export const ReportView: React.FC = () => {
                     <div key={idx} className="report-photo-item">
                       <img src={photo.dataUrl} alt={photo.name} className="report-photo-item__img" />
                       <p className="report-photo-item__caption">
-                        {photo.name} — {photo.questionId.replace(/([A-Z])/g, ' $1').trim()}
+                        {questionTextMap[photo.questionId] || photo.questionId}
                       </p>
                     </div>
                   ))}
