@@ -6,6 +6,7 @@ import './AppShell.css';
 interface AppShellProps {
   title: string;
   children: React.ReactNode;
+  isDashboard?: boolean; // <-- 1. Added this new prop
 }
 
 const navItems = [
@@ -17,7 +18,7 @@ const navItems = [
   { to: '/contact', label: 'Contact Us' }
 ];
 
-export const AppShell: React.FC<AppShellProps> = ({ title, children }) => {
+export const AppShell: React.FC<AppShellProps> = ({ title, children, isDashboard }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -64,11 +65,16 @@ export const AppShell: React.FC<AppShellProps> = ({ title, children }) => {
         </div>
       </aside>
 
-      <main className="shell__main">
-        <header className="shell__header">
-          <h2>{title}</h2>
-        </header>
-        <section className="shell__content">{children}</section>
+      {/* 2. Added dynamic classes to remove padding when on the Dashboard */}
+      <main className={`shell__main ${isDashboard ? 'shell__main--dashboard' : ''}`}>
+        {!isDashboard && (
+          <header className="shell__header">
+            <h2>{title}</h2>
+          </header>
+        )}
+        <section className={`shell__content ${isDashboard ? 'shell__content--dashboard' : ''}`}>
+          {children}
+        </section>
       </main>
     </div>
   );
