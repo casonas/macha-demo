@@ -11,6 +11,8 @@ import {
   updateProfile,
   sendPasswordResetEmail,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
   type User as FirebaseUser
 } from 'firebase/auth';
 import { getFirebaseAuth } from '../firebaseConfig';
@@ -137,6 +139,17 @@ export async function login(email: string, password: string): Promise<User> {
   setSession(record.user);
   notifyListeners(record.user);
   return record.user;
+}
+
+export async function loginWithGoogle(): Promise<User> {
+  if (!USE_FIREBASE) {
+    throw new Error('Google Sign-In is only available with Firebase.');
+  }
+  const provider = new GoogleAuthProvider();
+  const cred = await signInWithPopup(getFirebaseAuth(), provider);
+  const user = firebaseUserToUser(cred.user);
+  notifyListeners(user);
+  return user;
 }
 
 export async function register(input: { displayName: string; email: string; password: string }): Promise<User> {

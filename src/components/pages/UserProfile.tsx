@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import AppShell from '../layout/AppShell';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { getProfile, saveProfile, listAssessments } from '../../services/data';
+import { getProfile, saveProfile, listAssessmentsByUser } from '../../services/data';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { MfaEnrollment } from '../molecules/MfaEnrollment';
@@ -25,7 +25,7 @@ export const UserProfile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
-  const assessments = useMemo(() => listAssessments(), []);
+  const assessments = useMemo(() => user ? listAssessmentsByUser(user.id) : [], [user]);
   const userId = user?.id || initial.userId || 'N/A';
 
   const handleEdit = useCallback(() => {
