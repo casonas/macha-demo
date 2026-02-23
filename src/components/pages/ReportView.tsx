@@ -37,7 +37,12 @@ export const ReportView: React.FC = () => {
   const { user } = useAuth();
   const reportRef = useRef<HTMLDivElement>(null);
 
-  const assessment = useMemo(() => id ? getAssessmentById(id) : null, [id]);
+  const assessment = useMemo(() => {
+    if (!id) return null;
+    const record = getAssessmentById(id);
+    if (record && user && record.userId && record.userId !== user.id) return null;
+    return record;
+  }, [id, user]);
 
   if (!assessment) {
     return (

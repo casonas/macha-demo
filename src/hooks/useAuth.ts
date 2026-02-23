@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   User,
   login as authLogin,
+  loginWithGoogle as authLoginWithGoogle,
   logout as authLogout,
   register as authRegister,
   requestPasswordReset,
@@ -18,6 +19,7 @@ interface UseAuthReturn {
   error: string | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   register: (displayName: string, email: string, password: string) => Promise<void>;
   requestReset: (email: string) => Promise<void>;
   updateProfile: (displayName: string) => Promise<void>;
@@ -59,6 +61,13 @@ export function useAuth(): UseAuthReturn {
     finally { setLoading(false); }
   }, []);
 
+  const loginWithGoogle = useCallback(async () => {
+    setLoading(true); setError(null);
+    try { setUser(await authLoginWithGoogle()); }
+    catch (err) { const m = err instanceof Error ? err.message : 'Google sign-in failed'; setError(m); throw err; }
+    finally { setLoading(false); }
+  }, []);
+
   const register = useCallback(async (displayName: string, email: string, password: string) => {
     setLoading(true); setError(null);
     try { setUser(await authRegister({ displayName, email, password })); }
@@ -85,5 +94,5 @@ export function useAuth(): UseAuthReturn {
     setUser(await getCurrentUser());
   }, []);
 
-  return { user, loading, error, isAuthenticated: !!user, login, register, requestReset, updateProfile, logout, refresh };
+  return { user, loading, error, isAuthenticated: !!user, login, loginWithGoogle, register, requestReset, updateProfile, logout, refresh };
 }
