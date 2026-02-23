@@ -18,7 +18,10 @@ type Step = 'idle' | 'phone' | 'verify' | 'done';
 export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
   const [enrolled, setEnrolled] = useState(isMfaEnrolled());
   const [step, setStep] = useState<Step>('idle');
-  const [phone, setPhone] = useState(userPhone || '');
+  const [phone, setPhone] = useState(() => {
+    const p = userPhone || '';
+    return p.startsWith('+1') ? p.slice(2) : p;
+  });
   const [code, setCode] = useState('');
   const [verificationId, setVerificationId] = useState('');
   const [error, setError] = useState('');
@@ -32,14 +35,15 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
   }, [step]);
 
   const handleStartEnrollment = useCallback(async () => {
-    if (!phone.trim()) {
-      setError('Please enter a phone number.');
+    const digits = phone.trim().replace(/\D/g, '');
+    if (digits.length !== 10) {
+      setError('Please enter a valid 10-digit phone number.');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      const vid = await startMfaEnrollment(phone.trim());
+      const vid = await startMfaEnrollment(`+1${digits}`);
       setVerificationId(vid);
       setStep('verify');
     } catch (e) {
@@ -121,11 +125,11 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
             label="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="+1 (555) 123-4567"
+            placeholder="(555) 123-4567"
             fullWidth
           />
           <p className="text-xs text-slate-400">
-            Include your country code (e.g., +1 for US). A verification code will be sent via SMS.
+            Enter your 10-digit US phone number. +1 is added automatically.
           </p>
           <div className="flex gap-3 justify-end">
             <Button variant="secondary" size="sm" onClick={() => { setStep('idle'); setError(''); }}>
@@ -139,7 +143,7 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
       ) : step === 'verify' ? (
         <div className="w-full max-w-md space-y-4">
           <p className="text-sm text-slate-600 text-center">
-            A verification code has been sent to <strong>{phone}</strong>.
+            A verification code has been sent to <strong>+1 {phone}</strong>.
           </p>
           <Input
             label="Verification Code"

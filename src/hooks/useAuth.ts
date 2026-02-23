@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   User,
+  MfaRequiredError,
   login as authLogin,
   loginWithGoogle as authLoginWithGoogle,
   logout as authLogout,
@@ -57,14 +58,20 @@ export function useAuth(): UseAuthReturn {
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true); setError(null);
     try { setUser(await authLogin(email, password)); }
-    catch (err) { const m = err instanceof Error ? err.message : 'Login failed'; setError(m); throw err; }
+    catch (err) {
+      if (err instanceof MfaRequiredError) { throw err; }
+      const m = err instanceof Error ? err.message : 'Login failed'; setError(m); throw err;
+    }
     finally { setLoading(false); }
   }, []);
 
   const loginWithGoogle = useCallback(async () => {
     setLoading(true); setError(null);
     try { setUser(await authLoginWithGoogle()); }
-    catch (err) { const m = err instanceof Error ? err.message : 'Google sign-in failed'; setError(m); throw err; }
+    catch (err) {
+      if (err instanceof MfaRequiredError) { throw err; }
+      const m = err instanceof Error ? err.message : 'Google sign-in failed'; setError(m); throw err;
+    }
     finally { setLoading(false); }
   }, []);
 

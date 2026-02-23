@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { MfaRequiredError, completeMfaLogin } from '../../services/auth/authService';
+import {
+  initRecaptcha,
+  startMfaSignIn,
+  completeMfaSignIn
+} from '../../services/auth/mfaService';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Card } from '../atoms/Card';
@@ -20,7 +26,23 @@ export const LoginMock: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // MFA state
+  const [mfaStep, setMfaStep] = useState(false);
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaVerificationId, setMfaVerificationId] = useState('');
+  const [mfaResolver, setMfaResolver] = useState<any>(null);
+  const [mfaPendingUser, setMfaPendingUser] = useState<any>(null);
+  const [mfaLoading, setMfaLoading] = useState(false);
+  const [mfaError, setMfaError] = useState('');
+  const recaptchaRef = useRef<HTMLDivElement>(null);
+
   const from = (location.state as any)?.from?.pathname || '/home';
+
+  useEffect(() => {
+    if (mfaStep && recaptchaRef.current) {
+      initRecaptcha('login-recaptcha-container');
+    }
+  }, [mfaStep]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,19 +50,143 @@ export const LoginMock: React.FC = () => {
     try {
       await login(email, password);
       navigate(from, { replace: true });
-    } catch {
-      // Error is handled by useAuth hook
+    } catch (err) {
+      if (err instanceof MfaRequiredError) {
+        setMfaResolver(err.resolver);
+        setMfaPendingUser(err.pendingUser);
+        setMfaError('');
+        setMfaCode('');
+        setMfaStep(true);
+
+        // Automatically send the verification code
+        try {
+          setMfaLoading(true);
+          const vid = await startMfaSignIn(err.resolver);
+          setMfaVerificationId(vid);
+        } catch (sendErr) {
+          setMfaError(sendErr instanceof Error ? sendErr.message : 'Failed to send verification code');
+        } finally {
+          setMfaLoading(false);
+        }
+      }
+      // Other errors handled by useAuth hook
     }
+  };
+
+  const handleMfaVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mfaCode.trim()) {
+      setMfaError('Please enter the verification code.');
+      return;
+    }
+    setMfaError('');
+    setMfaLoading(true);
+    try {
+      await completeMfaSignIn(mfaResolver, mfaVerificationId, mfaCode.trim());
+      // For mock mode, complete the login with the pending user
+      if (mfaPendingUser) {
+        completeMfaLogin(mfaPendingUser);
+      }
+      navigate(from, { replace: true });
+    } catch (err) {
+      setMfaError(err instanceof Error ? err.message : 'Invalid verification code');
+    } finally {
+      setMfaLoading(false);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setMfaStep(false);
+    setMfaCode('');
+    setMfaVerificationId('');
+    setMfaResolver(null);
+    setMfaPendingUser(null);
+    setMfaError('');
   };
 
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
       navigate(from, { replace: true });
-    } catch {
-      // Error is handled by useAuth hook
+    } catch (err) {
+      if (err instanceof MfaRequiredError) {
+        setMfaResolver(err.resolver);
+        setMfaPendingUser(err.pendingUser);
+        setMfaError('');
+        setMfaCode('');
+        setMfaStep(true);
+
+        try {
+          setMfaLoading(true);
+          const vid = await startMfaSignIn(err.resolver);
+          setMfaVerificationId(vid);
+        } catch (sendErr) {
+          setMfaError(sendErr instanceof Error ? sendErr.message : 'Failed to send verification code');
+        } finally {
+          setMfaLoading(false);
+        }
+      }
+      // Other errors handled by useAuth hook
     }
   };
+
+  // MFA Verification Screen
+  if (mfaStep) {
+    return (
+      <div className="login-mock">
+        <Card className="login-mock__card" padding="lg" shadow="lg">
+          <div className="login-mock__header">
+            <img src="/Logo.png" alt="Macha Group" style={{ width: 70, height: 56, margin: '0 auto 0.7rem' }} />
+            <h1 className="login-mock__title">Verification Required</h1>
+            <p className="login-mock__subtitle">
+              A verification code has been sent to your phone via SMS.
+            </p>
+          </div>
+
+          {/* Recaptcha container (invisible) */}
+          <div id="login-recaptcha-container" ref={recaptchaRef} />
+
+          <form onSubmit={handleMfaVerify} className="login-mock__form">
+            {mfaError && (
+              <div className="login-mock__error">
+                {mfaError}
+              </div>
+            )}
+
+            <Input
+              type="text"
+              label="Verification Code"
+              value={mfaCode}
+              onChange={(e) => setMfaCode(e.target.value)}
+              placeholder="Enter 6-digit code"
+              required
+              fullWidth
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              loading={mfaLoading}
+              size="lg"
+            >
+              Verify &amp; Sign In
+            </Button>
+
+            <Button
+              type="button"
+              fullWidth
+              size="lg"
+              variant="secondary"
+              onClick={handleBackToLogin}
+              disabled={mfaLoading}
+            >
+              Back to Login
+            </Button>
+          </form>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="login-mock">

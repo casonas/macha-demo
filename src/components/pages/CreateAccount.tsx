@@ -40,8 +40,9 @@ export const CreateAccount: React.FC = () => {
       setError('Full name, email, phone number, and password are required.');
       return;
     }
-    if (!/^\+?[\d\s().-]{7,15}$/.test(form.phone.trim())) {
-      setError('Please enter a valid phone number.');
+    const digits = form.phone.trim().replace(/\D/g, '');
+    if (digits.length !== 10) {
+      setError('Please enter a valid 10-digit phone number.');
       return;
     }
     if (form.password !== form.confirmPassword) {
@@ -50,8 +51,9 @@ export const CreateAccount: React.FC = () => {
     }
 
     try {
+      const phoneWithCode = `+1${form.phone.trim().replace(/\D/g, '')}`;
       await register(form.fullName, form.email, form.password, {
-        phone: form.phone,
+        phone: phoneWithCode,
         organization: form.organization,
         address: [form.streetAddress, form.city, form.state, form.zipCode].filter(Boolean).join(', '),
       });
@@ -81,7 +83,7 @@ export const CreateAccount: React.FC = () => {
               <Input label="Email Address" type="email" value={form.email} onChange={update('email')} placeholder="john@example.com" required fullWidth />
             </div>
             <div className="create-account__row">
-              <Input label="Phone Number" value={form.phone} onChange={update('phone')} placeholder="(555) 123-4567" required fullWidth />
+              <Input label="Phone Number" value={form.phone} onChange={update('phone')} placeholder="(555) 123-4567" helperText="US number — +1 is added automatically" required fullWidth />
               <Input label="Organization" value={form.organization} onChange={update('organization')} placeholder="School District / Company" fullWidth />
             </div>
           </fieldset>

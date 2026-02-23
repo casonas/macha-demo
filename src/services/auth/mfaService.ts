@@ -68,7 +68,7 @@ export async function startMfaEnrollment(phoneNumber: string): Promise<string> {
 export async function completeMfaEnrollment(verificationId: string, smsCode: string): Promise<void> {
   if (!USE_FIREBASE) {
     await new Promise(r => setTimeout(r, 500));
-    if (smsCode.length < 4) throw new Error('Invalid verification code');
+    if (!/^\d{6}$/.test(smsCode)) throw new Error('Invalid verification code. Please enter a 6-digit code.');
     localStorage.setItem('macha.mfaEnrolled', 'true');
     localStorage.removeItem('macha.mfaPending');
     return;
@@ -86,7 +86,14 @@ export async function completeMfaEnrollment(verificationId: string, smsCode: str
  * Resolve a multi-factor sign-in challenge.
  * Called when login throws `auth/multi-factor-auth-required`.
  */
-export async function startMfaSignIn(resolver: MultiFactorResolver): Promise<string> {
+export async function startMfaSignIn(resolver: MultiFactorResolver | null): Promise<string> {
+  if (!USE_FIREBASE) {
+    // Mock: simulate sending SMS
+    await new Promise(r => setTimeout(r, 800));
+    return 'mock-signin-verification-id';
+  }
+
+  if (!resolver) throw new Error('Resolver is required for Firebase MFA.');
   if (!recaptchaVerifier) throw new Error('Recaptcha not initialized.');
 
   const phoneInfoOptions = {
@@ -101,10 +108,17 @@ export async function startMfaSignIn(resolver: MultiFactorResolver): Promise<str
  * Complete multi-factor sign-in with the SMS code.
  */
 export async function completeMfaSignIn(
-  resolver: MultiFactorResolver,
+  resolver: MultiFactorResolver | null,
   verificationId: string,
   smsCode: string
 ): Promise<void> {
+  if (!USE_FIREBASE) {
+    await new Promise(r => setTimeout(r, 500));
+    if (!/^\d{6}$/.test(smsCode)) throw new Error('Invalid verification code. Please enter a 6-digit code.');
+    return;
+  }
+
+  if (!resolver) throw new Error('Resolver is required for Firebase MFA.');
   const cred = PhoneAuthProvider.credential(verificationId, smsCode);
   const assertion = PhoneMultiFactorGenerator.assertion(cred);
   await resolver.resolveSignIn(assertion);
