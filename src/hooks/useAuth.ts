@@ -13,6 +13,7 @@ import {
   startSessionMonitor,
   stopSessionMonitor
 } from '../services/auth/authService';
+import { setCurrentUserId } from '../services/data';
 
 interface UseAuthReturn {
   user: User | null;
@@ -38,7 +39,10 @@ export function useAuth(): UseAuthReturn {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        if (currentUser) startSessionMonitor();
+        if (currentUser) {
+          setCurrentUserId(currentUser.id);
+          startSessionMonitor();
+        }
       } finally {
         setLoading(false);
       }
@@ -46,8 +50,13 @@ export function useAuth(): UseAuthReturn {
     checkAuth();
     const unsubscribe = subscribeToAuthState((u) => {
       setUser(u);
-      if (u) startSessionMonitor();
-      else stopSessionMonitor();
+      if (u) {
+        setCurrentUserId(u.id);
+        startSessionMonitor();
+      } else {
+        setCurrentUserId('');
+        stopSessionMonitor();
+      }
     });
     return () => {
       unsubscribe();

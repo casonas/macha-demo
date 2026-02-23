@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { MfaRequiredError, completeMfaLogin } from '../../services/auth/authService';
 import {
   initRecaptcha,
+  isMfaEnrolled,
   startMfaSignIn,
   completeMfaSignIn
 } from '../../services/auth/mfaService';
@@ -49,6 +50,11 @@ export const LoginMock: React.FC = () => {
     
     try {
       await login(email, password);
+      // If MFA is not enrolled, redirect to MFA setup
+      if (!isMfaEnrolled()) {
+        navigate('/mfa-setup', { replace: true });
+        return;
+      }
       navigate(from, { replace: true });
     } catch (err) {
       if (err instanceof MfaRequiredError) {
@@ -107,6 +113,11 @@ export const LoginMock: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
+      // If MFA is not enrolled, redirect to MFA setup
+      if (!isMfaEnrolled()) {
+        navigate('/mfa-setup', { replace: true });
+        return;
+      }
       navigate(from, { replace: true });
     } catch (err) {
       if (err instanceof MfaRequiredError) {

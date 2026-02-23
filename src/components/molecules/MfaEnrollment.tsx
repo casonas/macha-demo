@@ -6,14 +6,13 @@ import {
   isMfaEnrolled,
   startMfaEnrollment,
   completeMfaEnrollment,
-  unenrollMfa
 } from '../../services/auth/mfaService';
 
 interface MfaEnrollmentProps {
   userPhone?: string;
 }
 
-type Step = 'idle' | 'phone' | 'verify' | 'done';
+type Step = 'idle' | 'phone' | 'verify';
 
 export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
   const [enrolled, setEnrolled] = useState(isMfaEnrolled());
@@ -63,7 +62,7 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
     try {
       await completeMfaEnrollment(verificationId, code.trim());
       setEnrolled(true);
-      setStep('done');
+      setStep('idle');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid verification code');
     } finally {
@@ -71,27 +70,11 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
     }
   }, [code, verificationId]);
 
-  const handleUnenroll = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    try {
-      await unenrollMfa();
-      setEnrolled(false);
-      setStep('idle');
-      setCode('');
-      setVerificationId('');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to disable MFA');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 w-full flex flex-col items-center">
       <h3 className="text-lg font-bold text-slate-900 mb-2">SMS Multi-Factor Authentication</h3>
       <p className="text-sm text-slate-500 mb-6 text-center max-w-md">
-        Add an extra layer of security to your account by enabling SMS verification during sign-in.
+        MFA is required for all accounts. Your phone number is used to verify your identity during sign-in.
       </p>
 
       {/* Recaptcha container (invisible) */}
@@ -103,7 +86,7 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
         </div>
       )}
 
-      {enrolled && step !== 'done' && step !== 'phone' && step !== 'verify' ? (
+      {enrolled && step === 'idle' ? (
         <div className="text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-2 mb-4">
             ✅ MFA Enabled
@@ -111,13 +94,13 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
           <p className="text-sm text-slate-500 mb-4">
             SMS verification is active on your account.
           </p>
-          <Button variant="danger" size="sm" onClick={handleUnenroll} loading={loading}>
-            Disable MFA
+          <Button size="sm" onClick={() => setStep('phone')} loading={loading}>
+            Update Phone Number
           </Button>
         </div>
       ) : step === 'idle' ? (
         <Button size="sm" onClick={() => setStep('phone')} loading={loading}>
-          🔐 Enable SMS MFA
+          🔐 Enable MFA
         </Button>
       ) : step === 'phone' ? (
         <div className="w-full max-w-md space-y-4">
@@ -160,18 +143,6 @@ export const MfaEnrollment: React.FC<MfaEnrollmentProps> = ({ userPhone }) => {
               Verify &amp; Enable
             </Button>
           </div>
-        </div>
-      ) : step === 'done' ? (
-        <div className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-2 mb-4">
-            ✅ MFA Enabled Successfully
-          </span>
-          <p className="text-sm text-slate-500 mb-4">
-            You will now be asked for a verification code when signing in.
-          </p>
-          <Button variant="danger" size="sm" onClick={handleUnenroll} loading={loading}>
-            Disable MFA
-          </Button>
         </div>
       ) : null}
     </div>
