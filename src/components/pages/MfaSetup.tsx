@@ -119,7 +119,7 @@ export const MfaSetup: React.FC = () => {
           </form>
         ) : (
           <form onSubmit={handleVerify} className="create-account__form">
-            <p style={{ fontSize: '0.9rem', color: '#475569', textAlign: 'center', margin: 0 }}>
+            <p className="text-sm text-slate-500 text-center m-0">
               Code sent to <strong>+1 {phone}</strong>
             </p>
             <Input
@@ -147,7 +147,7 @@ export const MfaSetup: React.FC = () => {
         )}
 
         {user && (
-          <p style={{ fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center', marginTop: '1rem' }}>
+          <p className="text-xs text-slate-400 text-center mt-4">
             Signed in as {user.email}
           </p>
         )}

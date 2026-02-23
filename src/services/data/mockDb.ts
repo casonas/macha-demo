@@ -111,7 +111,7 @@ export function deleteAssessment(id: string): void {
 
 export function upsertAssessment(record: AssessmentRecord) {
   const key = userAssessKey(record.userId);
-  const all = load<AssessmentRecord[]>(key, []).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const all = load<AssessmentRecord[]>(key, []);
   const idx = all.findIndex(x => x.id === record.id);
   if (idx >= 0) all[idx] = record;
   else all.unshift(record);
