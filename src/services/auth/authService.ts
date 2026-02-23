@@ -262,3 +262,33 @@ export async function refreshSession(): Promise<void> {
   session.expiresAt = Date.now() + 3600000;
   localStorage.setItem('mockAuthSession', JSON.stringify(session));
 }
+
+/**
+ * Session inactivity timeout.
+ * Logs the user out after the specified period of inactivity.
+ */
+const INACTIVITY_TIMEOUT_MS = Number(process.env.REACT_APP_SESSION_TIMEOUT_MS || 30 * 60 * 1000); // 30 min default
+let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+
+function resetInactivityTimer() {
+  if (inactivityTimer) clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(async () => {
+    const user = await getCurrentUser();
+    if (user) {
+      await logout();
+      window.dispatchEvent(new CustomEvent('session-timeout'));
+    }
+  }, INACTIVITY_TIMEOUT_MS);
+}
+
+export function startSessionMonitor() {
+  const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+  events.forEach(evt => window.addEventListener(evt, resetInactivityTimer, { passive: true }));
+  resetInactivityTimer();
+}
+
+export function stopSessionMonitor() {
+  if (inactivityTimer) clearTimeout(inactivityTimer);
+  const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+  events.forEach(evt => window.removeEventListener(evt, resetInactivityTimer));
+}

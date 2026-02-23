@@ -7,7 +7,9 @@ import {
   requestPasswordReset,
   updateCurrentUserProfile,
   getCurrentUser,
-  subscribeToAuthState
+  subscribeToAuthState,
+  startSessionMonitor,
+  stopSessionMonitor
 } from '../services/auth/authService';
 
 interface UseAuthReturn {
@@ -31,14 +33,23 @@ export function useAuth(): UseAuthReturn {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        setUser(await getCurrentUser());
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+        if (currentUser) startSessionMonitor();
       } finally {
         setLoading(false);
       }
     };
     checkAuth();
-    const unsubscribe = subscribeToAuthState(setUser);
-    return unsubscribe;
+    const unsubscribe = subscribeToAuthState((u) => {
+      setUser(u);
+      if (u) startSessionMonitor();
+      else stopSessionMonitor();
+    });
+    return () => {
+      unsubscribe();
+      stopSessionMonitor();
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {

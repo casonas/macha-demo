@@ -11,6 +11,7 @@ const recordId = params.get('id') || getActiveAssessmentId() || 'AS-LOCAL';
 const record = getAssessmentById(recordId);
 const assessmentId = record?.assessmentId || 'school-security-v1';
 const buildingId = record?.buildingId || 'building-001';
+const savedResponses = record?.responses || {};
 
 const handleSubmit = async (responses: Record<string, any>) => {
 completeAssessment(recordId, responses);
@@ -30,6 +31,7 @@ assessmentId={assessmentId}
 buildingId={buildingId}
 onSubmit={handleSubmit}
 onSave={handleSave}
+initialData={savedResponses}
 />
 </div>
 </AppShell>

@@ -36,8 +36,12 @@ export const CreateAccount: React.FC = () => {
     e.preventDefault();
     setError('');
 
-    if (!form.fullName.trim() || !form.email.trim() || !form.password) {
-      setError('Full name, email, and password are required.');
+    if (!form.fullName.trim() || !form.email.trim() || !form.phone.trim() || !form.password) {
+      setError('Full name, email, phone number, and password are required.');
+      return;
+    }
+    if (!/^\+?[\d\s().,-]{7,}$/.test(form.phone.trim())) {
+      setError('Please enter a valid phone number.');
       return;
     }
     if (form.password !== form.confirmPassword) {
@@ -73,7 +77,7 @@ export const CreateAccount: React.FC = () => {
               <Input label="Email Address" type="email" value={form.email} onChange={update('email')} placeholder="john@example.com" required fullWidth />
             </div>
             <div className="create-account__row">
-              <Input label="Phone Number" value={form.phone} onChange={update('phone')} placeholder="(555) 123-4567" fullWidth />
+              <Input label="Phone Number" value={form.phone} onChange={update('phone')} placeholder="(555) 123-4567" required fullWidth />
               <Input label="Organization" value={form.organization} onChange={update('organization')} placeholder="School District / Company" fullWidth />
             </div>
           </fieldset>

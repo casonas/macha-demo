@@ -58,15 +58,12 @@ return isValid;
 
 const handleNext = useCallback(() => {
 if (!assessment) return;
-const current = assessment.categories[activeCategory];
-if (!current) return;
-
-if (validateCategory(current) && activeCategory < assessment.categories.length - 1) {
+if (activeCategory < assessment.categories.length - 1) {
 setActiveCategory((prev) => prev + 1);
 setSelectedSubsection('All');
 setValidationErrors({});
 }
-}, [assessment, activeCategory, validateCategory]);
+}, [assessment, activeCategory]);
 
 const handlePrevious = useCallback(() => {
 if (activeCategory > 0) {
@@ -83,12 +80,11 @@ onSave?.(responses);
 const handleSubmit = useCallback(async () => {
 if (!assessment) return;
 
-let allValid = true;
-assessment.categories.forEach((category) => {
-if (!validateCategory(category)) allValid = false;
-});
-
-if (!allValid) return;
+const answeredAny = Object.values(responses).some(v => v !== '' && v !== null && v !== undefined);
+if (!answeredAny) {
+setValidationErrors({ _form: 'Please answer at least one question before submitting.' });
+return;
+}
 
 setIsSubmitting(true);
 try {
@@ -96,7 +92,7 @@ await onSubmit?.(responses);
 } finally {
 setIsSubmitting(false);
 }
-}, [assessment, onSubmit, responses, validateCategory]);
+}, [assessment, onSubmit, responses]);
 
 const categoryProgress = useMemo(() => {
 if (!assessment) return [];
