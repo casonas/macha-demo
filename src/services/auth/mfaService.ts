@@ -9,7 +9,6 @@ import {
   PhoneAuthProvider,
   PhoneMultiFactorGenerator,
   RecaptchaVerifier,
-  type User as FirebaseUser,
   type MultiFactorResolver
 } from 'firebase/auth';
 import { getFirebaseAuth } from '../firebaseConfig';

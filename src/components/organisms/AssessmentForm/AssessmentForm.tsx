@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react';
-import { Category, Question } from '../../../types/assessment';
+import { Question } from '../../../types/assessment';
 import { useAssessment, useAssessmentResponse } from '../../../hooks/useAssessment';
 import { QuestionCard } from '../../molecules/QuestionCard';
 import { Button } from '../../atoms/Button';
@@ -34,27 +34,6 @@ const [activeQuery, setActiveQuery] = useState('');
 const [selectedSubsection, setSelectedSubsection] = useState('All');
 const chipsRef = useRef<HTMLDivElement | null>(null);
 const searchInputRef = useRef<HTMLInputElement | null>(null);
-
-const validateCategory = useCallback(
-(category: Category): boolean => {
-const errors: Record<string, string> = {};
-let isValid = true;
-
-category.questions.forEach((question) => {
-if (question.required) {
-const value = getResponse(question.id);
-if (value === undefined || value === null || value === '') {
-errors[question.id] = 'This question is required';
-isValid = false;
-}
-}
-});
-
-setValidationErrors(errors);
-return isValid;
-},
-[getResponse]
-);
 
 const handleNext = useCallback(() => {
 if (!assessment) return;
