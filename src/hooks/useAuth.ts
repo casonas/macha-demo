@@ -20,7 +20,7 @@ interface UseAuthReturn {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  register: (displayName: string, email: string, password: string) => Promise<void>;
+  register: (displayName: string, email: string, password: string, extra?: { phone?: string; organization?: string; address?: string }) => Promise<void>;
   requestReset: (email: string) => Promise<void>;
   updateProfile: (displayName: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -68,9 +68,9 @@ export function useAuth(): UseAuthReturn {
     finally { setLoading(false); }
   }, []);
 
-  const register = useCallback(async (displayName: string, email: string, password: string) => {
+  const register = useCallback(async (displayName: string, email: string, password: string, extra?: { phone?: string; organization?: string; address?: string }) => {
     setLoading(true); setError(null);
-    try { setUser(await authRegister({ displayName, email, password })); }
+    try { setUser(await authRegister({ displayName, email, password, ...extra })); }
     catch (err) { const m = err instanceof Error ? err.message : 'Register failed'; setError(m); throw err; }
     finally { setLoading(false); }
   }, []);

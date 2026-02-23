@@ -50,7 +50,11 @@ export const CreateAccount: React.FC = () => {
     }
 
     try {
-      await register(form.fullName, form.email, form.password);
+      await register(form.fullName, form.email, form.password, {
+        phone: form.phone,
+        organization: form.organization,
+        address: [form.streetAddress, form.city, form.state, form.zipCode].filter(Boolean).join(', '),
+      });
       navigate('/home');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create account');

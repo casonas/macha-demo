@@ -13,6 +13,7 @@ export interface AssessmentRecord {
   address?: string;
   buildingType?: string;
   userId?: string;
+  photos?: Record<string, { name: string; dataUrl: string }[]>;
 }
 
 export interface UserProfileRecord {
@@ -25,6 +26,9 @@ export interface UserProfileRecord {
 const ASSESS_KEY = 'macha.assessments';
 const ACTIVE_KEY = 'macha.activeAssessmentId';
 const PROFILE_KEY = 'macha.profile';
+
+// Match the same default as authService.ts — set REACT_APP_DATA_PROVIDER=local for offline development
+const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
 
 function now() {
   return new Date().toISOString();
@@ -41,6 +45,41 @@ function load<T>(key: string, fallback: T): T {
 
 function save<T>(key: string, value: T) {
   localStorage.setItem(key, JSON.stringify(value));
+}
+
+async function saveAssessmentToFirestore(record: AssessmentRecord) {
+  if (!USE_FIREBASE) return;
+  try {
+    const { doc, setDoc, serverTimestamp } = await import('firebase/firestore');
+    const { getFirebaseDb } = await import('../firebaseConfig');
+    const db = getFirebaseDb();
+    const { photos, ...data } = record;
+    await setDoc(doc(db, 'userAssessments', record.id), {
+      ...data,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  } catch (err) {
+    console.error('Failed to save assessment to Firestore:', err);
+  }
+}
+
+async function uploadPhotosToStorage(userId: string, assessmentId: string, photos: Record<string, { name: string; dataUrl: string }[]>) {
+  if (!USE_FIREBASE) return;
+  try {
+    const { ref, uploadString } = await import('firebase/storage');
+    const { getFirebaseStorage } = await import('../firebaseConfig');
+    const storage = getFirebaseStorage();
+    for (const [questionId, photoList] of Object.entries(photos)) {
+      for (let i = 0; i < photoList.length; i++) {
+        const photo = photoList[i];
+        const storagePath = `photos/${userId}/${assessmentId}/${questionId}/${i}_${photo.name}`;
+        const storageRef = ref(storage, storagePath);
+        await uploadString(storageRef, photo.dataUrl, 'data_url');
+      }
+    }
+  } catch (err) {
+    console.error('Failed to upload photos to Firebase Storage:', err);
+  }
 }
 
 export function listAssessments(): AssessmentRecord[] {
@@ -102,12 +141,17 @@ export function saveAssessmentProgress(id: string, responses: Record<string, any
   upsertAssessment({ ...found, responses, status: 'in-progress', updatedAt: now() });
 }
 
-export function completeAssessment(id: string, responses: Record<string, any>) {
+export function completeAssessment(id: string, responses: Record<string, any>, photos?: Record<string, { name: string; dataUrl: string }[]>) {
   const found = getAssessmentById(id);
   if (!found) return;
   const answered = Object.values(responses).filter(v => v !== '' && v !== null && v !== undefined).length;
   const score = Math.max(60, Math.min(100, Math.round(60 + answered * 1.2)));
-  upsertAssessment({ ...found, responses, status: 'completed', score, updatedAt: now() });
+  const updated: AssessmentRecord = { ...found, responses, status: 'completed', score, updatedAt: now(), photos };
+  upsertAssessment(updated);
+  saveAssessmentToFirestore(updated);
+  if (photos && found.userId) {
+    uploadPhotosToStorage(found.userId, id, photos);
+  }
 }
 
 export function getProfile(): UserProfileRecord {
