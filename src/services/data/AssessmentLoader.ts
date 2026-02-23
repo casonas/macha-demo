@@ -53,7 +53,7 @@ try {
     }
     localStorage.removeItem(LS_CACHE_PREFIX + key);
   }
-} catch { /* ignore parse errors */ }
+} catch (e) { console.warn('Assessment cache read failed:', e); }
 
 return null;
 }

@@ -68,7 +68,7 @@ export async function startMfaEnrollment(phoneNumber: string): Promise<string> {
 export async function completeMfaEnrollment(verificationId: string, smsCode: string): Promise<void> {
   if (!USE_FIREBASE) {
     await new Promise(r => setTimeout(r, 500));
-    if (smsCode.length < 4) throw new Error('Invalid verification code');
+    if (!/^\d{6}$/.test(smsCode)) throw new Error('Invalid verification code. Please enter a 6-digit code.');
     localStorage.setItem('macha.mfaEnrolled', 'true');
     localStorage.removeItem('macha.mfaPending');
     return;
@@ -114,7 +114,7 @@ export async function completeMfaSignIn(
 ): Promise<void> {
   if (!USE_FIREBASE) {
     await new Promise(r => setTimeout(r, 500));
-    if (smsCode.length < 4) throw new Error('Invalid verification code');
+    if (!/^\d{6}$/.test(smsCode)) throw new Error('Invalid verification code. Please enter a 6-digit code.');
     return;
   }
 
