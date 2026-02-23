@@ -41,6 +41,7 @@ if (activeCategory < assessment.categories.length - 1) {
 setActiveCategory((prev) => prev + 1);
 setSelectedSubsection('All');
 setValidationErrors({});
+window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 }, [assessment, activeCategory]);
 
@@ -49,6 +50,7 @@ if (activeCategory > 0) {
 setActiveCategory((prev) => prev - 1);
 setSelectedSubsection('All');
 setValidationErrors({});
+window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 }, [activeCategory]);
 
@@ -203,6 +205,7 @@ className={`section-item ${s.idx === activeCategory ? 'section-item--active' : '
 onClick={() => {
 setActiveCategory(s.idx);
 setSelectedSubsection('All');
+window.scrollTo({ top: 0, behavior: 'smooth' });
 }}
 >
 <span className="dot" />
@@ -222,6 +225,7 @@ setSelectedSubsection('All');
 onClick={() => {
 setActiveCategory(s.idx);
 setSelectedSubsection('All');
+window.scrollTo({ top: 0, behavior: 'smooth' });
 }}
 >
 {s.title}: {s.answered}/{s.total} answered ({s.percent}%)
@@ -247,6 +251,7 @@ value={activeCategory}
 onChange={(e) => {
 setActiveCategory(Number(e.target.value));
 setSelectedSubsection('All');
+window.scrollTo({ top: 0, behavior: 'smooth' });
 }}
 >
 {assessment.categories.map((c, i) => (

@@ -116,6 +116,9 @@ transform: rotate(360deg);
 .assessment-form__header {
 margin-bottom: 1rem;
 border-radius: 14px;
+position: sticky;
+top: 0;
+z-index: 10;
 }
 
 .assessment-form__title {
@@ -352,6 +355,14 @@ display: flex;
 justify-content: space-between;
 align-items: center;
 gap: 1rem;
+position: sticky;
+bottom: 0;
+background: #fff;
+padding: 1rem;
+border-radius: 14px;
+border: 1px solid #e2e8f0;
+box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+z-index: 10;
 }
 
 .assessment-form__actions-center {

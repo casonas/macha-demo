@@ -26,12 +26,26 @@ export interface UserProfileRecord {
 const ASSESS_KEY = 'macha.assessments';
 const ACTIVE_KEY = 'macha.activeAssessmentId';
 const PROFILE_KEY = 'macha.profile';
+const CURRENT_USER_KEY = 'macha.currentUserId';
 
 // Match the same default as authService.ts — set REACT_APP_DATA_PROVIDER=local for offline development
 const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
 
 function now() {
   return new Date().toISOString();
+}
+
+function getCurrentUserId(): string {
+  return localStorage.getItem(CURRENT_USER_KEY) || '';
+}
+
+export function setCurrentUserId(userId: string) {
+  localStorage.setItem(CURRENT_USER_KEY, userId);
+}
+
+function userAssessKey(userId?: string): string {
+  const uid = userId || getCurrentUserId();
+  return uid ? `${ASSESS_KEY}.${uid}` : ASSESS_KEY;
 }
 
 function load<T>(key: string, fallback: T): T {
@@ -83,24 +97,25 @@ async function uploadPhotosToStorage(userId: string, assessmentId: string, photo
 }
 
 export function listAssessments(): AssessmentRecord[] {
-  return load<AssessmentRecord[]>(ASSESS_KEY, []).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return load<AssessmentRecord[]>(userAssessKey(), []).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export function listAssessmentsByUser(userId: string): AssessmentRecord[] {
-  return listAssessments().filter(a => a.userId === userId);
+  return load<AssessmentRecord[]>(userAssessKey(userId), []).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export function deleteAssessment(id: string): void {
   const all = listAssessments().filter(a => a.id !== id);
-  save(ASSESS_KEY, all);
+  save(userAssessKey(), all);
 }
 
 export function upsertAssessment(record: AssessmentRecord) {
-  const all = listAssessments();
+  const key = userAssessKey(record.userId);
+  const all = load<AssessmentRecord[]>(key, []).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const idx = all.findIndex(x => x.id === record.id);
   if (idx >= 0) all[idx] = record;
   else all.unshift(record);
-  save(ASSESS_KEY, all);
+  save(key, all);
 }
 
 export function createAssessment(input: { name: string; buildingId: string; assessmentId: string; address?: string; buildingType?: string; userId?: string }): AssessmentRecord {
@@ -138,7 +153,9 @@ export function getActiveAssessmentId(): string | null {
 export function saveAssessmentProgress(id: string, responses: Record<string, any>) {
   const found = getAssessmentById(id);
   if (!found) return;
-  upsertAssessment({ ...found, responses, status: 'in-progress', updatedAt: now() });
+  const updated = { ...found, responses, status: 'in-progress' as AssessmentStatus, updatedAt: now() };
+  upsertAssessment(updated);
+  saveAssessmentToFirestore(updated);
 }
 
 export function completeAssessment(id: string, responses: Record<string, any>, photos?: Record<string, { name: string; dataUrl: string }[]>) {

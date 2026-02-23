@@ -30,9 +30,40 @@ Follow these steps in the Firebase Console to get everything working.
 - Enter a **Project support email** (your email)
 - Click **Save**
 
+### Phone (Required for MFA)
+- Click **Phone**
+- Toggle **Enable** to ON
+- Click **Save**
+
+> **Note:** Phone authentication is required for SMS-based multi-factor authentication.
+
 ---
 
-## 3. Configure Password Reset Email
+## 3. Enable Multi-Factor Authentication (MFA)
+
+MFA is **mandatory** for all users. Follow these steps to enable it:
+
+1. In Firebase Console, go to **Build → Authentication**
+2. Click the **Settings** tab
+3. Scroll down to **Multi-factor authentication**
+4. Click **Enable**
+5. Under **SMS**, ensure it is toggled to **Enabled**
+6. Click **Save**
+
+### Important Notes
+- Users cannot access the app without completing MFA enrollment
+- During account creation, users must provide a phone number and verify it via SMS
+- During login, users with MFA enrolled will be prompted for an SMS code
+- The app automatically redirects users to `/mfa-setup` if MFA is not enrolled
+
+### reCAPTCHA Configuration
+Firebase uses reCAPTCHA to prevent abuse of SMS. The app uses invisible reCAPTCHA.
+- No additional configuration needed — reCAPTCHA is handled automatically by Firebase
+- If you see reCAPTCHA errors, add your domain to **Authentication → Settings → Authorized domains**
+
+---
+
+## 4. Configure Password Reset Email
 
 1. In **Authentication**, go to the **Templates** tab
 2. Click **Password reset**
@@ -65,7 +96,7 @@ Follow these steps in the Firebase Console to get everything working.
 
 ---
 
-## 4. Set Up Cloud Firestore
+## 5. Set Up Cloud Firestore
 
 1. Go to **Build → Firestore Database**
 2. Click **Create database**
@@ -101,10 +132,14 @@ service cloud.firestore {
 
     match /userAssessments/{docId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll(['name', 'userId', 'status']);
+      allow update: if request.auth != null
         && resource.data.userId == request.auth.uid
         && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null
+        && resource.data.userId == request.auth.uid;
     }
 
     match /users/{userId} {
@@ -113,6 +148,11 @@ service cloud.firestore {
 
     match /photos/{userId}/{allPaths=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Deny all other access by default
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
@@ -127,11 +167,11 @@ The app will automatically create these collections when users interact with it:
 | Collection | Created When | Contents |
 |---|---|---|
 | `users` | User creates account or signs in with Google | User profile (name, email, phone, org, address) |
-| `userAssessments` | User completes an assessment | Assessment responses, score, metadata |
+| `userAssessments` | User saves or completes an assessment | Assessment responses, score, metadata |
 
 ---
 
-## 5. Set Up Firebase Storage (for Photos)
+## 6. Set Up Firebase Storage (for Photos)
 
 1. Go to **Build → Storage**
 2. Click **Get Started**
@@ -157,7 +197,35 @@ Click **Publish**.
 
 ---
 
-## 6. Configure Your App's Firebase Settings
+## 7. Additional Security Recommendations
+
+### App Check (Recommended)
+App Check protects your Firebase resources from abuse:
+
+1. Go to **Build → App Check** in Firebase Console
+2. Click **Get Started**
+3. For Web apps, select **reCAPTCHA v3** as the provider
+4. Register your app with a reCAPTCHA v3 site key from [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
+5. Once registered, click **Enforce** for Firestore, Storage, and Authentication
+
+### Email Enumeration Protection
+1. Go to **Authentication → Settings**
+2. Under **User actions**, ensure **Email enumeration protection** is enabled
+3. This prevents attackers from discovering valid email addresses
+
+### Authorized Domains
+1. Go to **Authentication → Settings → Authorized domains**
+2. Remove any domains you don't use
+3. Keep only: `localhost`, your Firebase Hosting domain, and any custom domains
+
+### Abuse Prevention
+1. Go to **Authentication → Settings**
+2. Set up **SMS abuse protection** to limit SMS verification attempts
+3. Configure **User account deletion** policies as needed
+
+---
+
+## 8. Configure Your App's Firebase Settings
 
 Your Firebase config is already in `src/services/firebaseConfig.ts`. Verify the values match your project:
 
@@ -190,7 +258,7 @@ REACT_APP_DATA_PROVIDER=firebase
 
 ---
 
-## 7. Deploy to Firebase Hosting
+## 9. Deploy to Firebase Hosting
 
 ```bash
 # Install Firebase CLI (if not installed)
@@ -208,19 +276,29 @@ firebase deploy
 
 ---
 
-## 8. Verify Everything Works
+## 10. Verify Everything Works
 
-### ✅ User Registration
+### ✅ User Registration + MFA
 1. Go to your app and click **Create Account**
-2. Fill in the form and submit
-3. Check **Firebase Console → Authentication → Users** — the new user should appear
-4. Check **Firestore → users** collection — a document with the user's UID should exist with their profile data
+2. Fill in the form with a valid phone number and submit
+3. You will be redirected to the **MFA Setup** page
+4. Enter the 6-digit code sent to your phone via SMS
+5. After verification, you will be redirected to the dashboard
+6. Check **Firebase Console → Authentication → Users** — the new user should appear with MFA enrolled
+7. Check **Firestore → users** collection — a document with the user's UID should exist
 
-### ✅ Google Sign-In
+### ✅ Login with MFA
+1. Log in with email and password
+2. If MFA is enrolled, you will receive an SMS code
+3. Enter the code to complete sign-in
+4. If MFA is not enrolled, you will be redirected to `/mfa-setup`
+
+### ✅ Google Sign-In + MFA
 1. Click **Sign in with Google** on the login page
 2. Complete the Google OAuth flow
-3. Check **Authentication → Users** — the Google account should appear
-4. Check **Firestore → users** — a profile document should be created
+3. If MFA is not enrolled, you will be redirected to `/mfa-setup`
+4. Complete phone verification
+5. Check **Authentication → Users** — the Google account should appear
 
 ### ✅ Forgot Password
 1. Click **Forgot password** on the login page
@@ -232,7 +310,8 @@ firebase deploy
 ### ✅ Assessment Data
 1. Create and complete an assessment
 2. Check **Firestore → userAssessments** — a document with the assessment data should appear
-3. If photos were attached, check **Storage → photos/{userId}/{assessmentId}/** — uploaded images should appear
+3. In-progress assessments are also saved to Firestore
+4. If photos were attached, check **Storage → photos/{userId}/{assessmentId}/** — uploaded images should appear
 
 ### ✅ Reports
 1. After submitting an assessment, you should be automatically redirected to the report
@@ -251,3 +330,6 @@ firebase deploy
 | Password reset email not received | Check spam folder; verify email exists in Authentication → Users |
 | Firestore permission denied | Verify security rules are published and user is authenticated |
 | Photos not uploading | Verify Storage rules are published and Storage is enabled |
+| MFA SMS not received | Verify Phone provider is enabled in Authentication → Sign-in method |
+| reCAPTCHA errors | Add your domain to Authentication → Settings → Authorized domains |
+| "auth/requires-recent-login" for MFA enrollment | User needs to re-authenticate before enrolling MFA |

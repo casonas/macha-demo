@@ -12,6 +12,7 @@ import { AboutUs } from './components/pages/AboutUs';
 import { CreateAssessment } from './components/pages/CreateAssessment';
 import { ReportView } from './components/pages/ReportView';
 import { ContactUs } from './components/pages/ContactUs';
+import { MfaSetup } from './components/pages/MfaSetup';
 import './App.css';
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/login" element={<LoginMock />} />
         <Route path="/create-account" element={<CreateAccount />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/mfa-setup" element={<MfaSetup />} />
 
         {/* Protected routes */}
         <Route path="/home" element={<Protected><HomeScreen /></Protected>} />

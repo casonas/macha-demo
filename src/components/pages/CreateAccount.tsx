@@ -57,7 +57,7 @@ export const CreateAccount: React.FC = () => {
         organization: form.organization,
         address: [form.streetAddress, form.city, form.state, form.zipCode].filter(Boolean).join(', '),
       });
-      navigate('/home');
+      navigate('/mfa-setup');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create account');
     }

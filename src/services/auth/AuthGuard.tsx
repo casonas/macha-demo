@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { isMfaEnrolled } from '../auth/mfaService';
 import './AuthGuard.css';
 
 interface AuthGuardProps {
@@ -10,8 +11,9 @@ interface AuthGuardProps {
 
 /**
  * AuthGuard Component
- * Protects routes by checking authentication status
- * Redirects to login if not authenticated
+ * Protects routes by checking authentication status and MFA enrollment.
+ * Redirects to login if not authenticated.
+ * Redirects to MFA setup if MFA is not enrolled.
  */
 export const AuthGuard: React.FC<AuthGuardProps> = ({ 
   children, 
@@ -32,6 +34,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   if (!isAuthenticated) {
     // Redirect to login, saving the attempted URL
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Check MFA enrollment — redirect to setup if not enrolled
+  if (!isMfaEnrolled()) {
+    return <Navigate to="/mfa-setup" replace />;
   }
 
   // Check role requirements
