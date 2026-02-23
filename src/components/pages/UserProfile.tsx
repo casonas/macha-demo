@@ -3,8 +3,6 @@ import AppShell from '../layout/AppShell';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { getProfile, saveProfile, listAssessmentsByUser } from '../../services/data';
-import { Button } from '../atoms/Button';
-import { Input } from '../atoms/Input';
 import { MfaEnrollment } from '../molecules/MfaEnrollment';
 import './pages.css';
 
@@ -66,146 +64,224 @@ export const UserProfile: React.FC = () => {
     setEditForm(prev => ({ ...prev, [field]: e.target.value }));
 
   return (
-    <AppShell title="My Profile">
-      <div className="space-y-6 flex flex-col items-center w-full">
-        {/* Profile Header */}
-        <div className="relative overflow-hidden rounded-2xl p-10 sm:p-12 text-white flex flex-col items-center gap-5 text-center w-full" style={{ background: 'radial-gradient(circle at top, #142b14 0%, #050805 75%)' }}>
-          <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-15 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
-          <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-10 translate-y-1/2 -translate-x-1/4" style={{ background: '#32dc32' }} />
-          <div className="relative z-10 w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-3xl font-extrabold text-white border-2 border-white/30 mx-auto">
-            {(displayName || 'G').charAt(0).toUpperCase()}
+    <AppShell title="My Profile" isDashboard={true}>
+      
+      {/* 1. Main Background Wrapper */}
+      <div 
+        className="w-full min-h-screen bg-slate-50/50 flex flex-col items-center"
+        style={{ paddingTop: '3rem', paddingBottom: '6rem', paddingLeft: '1rem', paddingRight: '1rem' }}
+      >
+        <div className="w-full max-w-4xl flex flex-col" style={{ gap: '2rem' }}>
+          
+          {/* 2. HERO HEADER - Expansive with a prominent avatar */}
+          <div 
+            className="relative w-full flex flex-col items-center justify-center shadow-xl overflow-hidden text-center" 
+            style={{ 
+              background: 'radial-gradient(circle at top, #142b14 0%, #050805 100%)',
+              paddingTop: '4rem',
+              paddingBottom: '4rem',
+              borderRadius: '2rem'
+            }}
+          >
+            <div className="absolute top-0 right-0 w-80 h-80 rounded-full opacity-10 -translate-y-1/2 translate-x-1/3" style={{ background: '#228b22' }} />
+            
+            <div className="relative z-10 flex flex-col items-center gap-4">
+              <div 
+                className="bg-white/20 backdrop-blur-md flex items-center justify-center font-extrabold text-white border-2 border-white/30 shadow-lg"
+                style={{ width: '6rem', height: '6rem', borderRadius: '1.5rem', fontSize: '2.5rem' }}
+              >
+                {(displayName || 'G').charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{displayName || 'Guest'}</h2>
+                <p className="text-emerald-200 text-base mt-1">{user?.email}</p>
+                <div className="mt-3 inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-emerald-300 text-xs font-mono tracking-wider">
+                  ID: {userId}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="relative z-10 text-center w-full">
-            <h2 className="text-2xl font-extrabold">{displayName || 'Guest'}</h2>
-            <p className="text-emerald-200 text-sm mt-1">{user?.email}</p>
-            <p className="text-emerald-300 text-xs mt-1 font-mono">ID: {userId}</p>
-          </div>
-        </div>
 
-        {/* Success Message */}
-        {successMsg && (
-          <div className="w-full rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-3 text-center">
-            {successMsg}
-          </div>
-        )}
+          {/* Success Message Banner */}
+          {successMsg && (
+            <div className="w-full rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-bold px-6 py-4 flex items-center gap-3 shadow-sm animate-fade-in">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              {successMsg}
+            </div>
+          )}
 
-        {/* Account Details Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center w-full flex flex-col items-center">
-          <div className="flex items-center justify-between w-full max-w-xl mb-6">
-            <h3 className="text-lg font-bold text-slate-900">Account Details</h3>
-            {!editing && (
-              <Button variant="ghost" size="sm" onClick={handleEdit}>
-                ✏️ Edit Profile
-              </Button>
+          {/* 3. ACCOUNT DETAILS CARD */}
+          <div 
+            className="bg-white border border-slate-200 shadow-sm flex flex-col"
+            style={{ borderRadius: '2rem', padding: '3rem' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid #f1f5f9' }}>
+              <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Account Details
+              </h3>
+              {!editing && (
+                <button 
+                  onClick={handleEdit}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 font-bold text-sm border border-slate-200 hover:border-emerald-200 transition-colors cursor-pointer"
+                  style={{ borderRadius: '0.75rem' }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  Edit Profile
+                </button>
+              )}
+            </div>
+
+            {editing ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label className="font-bold text-slate-700 text-sm ml-1">Full Name</label>
+                    <input
+                      value={editForm.displayName}
+                      onChange={updateField('displayName')}
+                      placeholder="Your full name"
+                      className="border-2 border-slate-100 bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 transition-all w-full"
+                      style={{ padding: '0.875rem 1.25rem', borderRadius: '1rem' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label className="font-bold text-slate-700 text-sm ml-1">Phone Number</label>
+                    <input
+                      value={editForm.phone}
+                      onChange={updateField('phone')}
+                      placeholder="(555) 123-4567"
+                      className="border-2 border-slate-100 bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 transition-all w-full"
+                      style={{ padding: '0.875rem 1.25rem', borderRadius: '1rem' }}
+                    />
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label className="font-bold text-slate-700 text-sm ml-1">Address</label>
+                  <input
+                    value={editForm.address}
+                    onChange={updateField('address')}
+                    placeholder="123 Main St, City, ST 12345"
+                    className="border-2 border-slate-100 bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 transition-all w-full"
+                    style={{ padding: '0.875rem 1.25rem', borderRadius: '1rem' }}
+                  />
+                </div>
+
+                <div className="flex gap-3 justify-end mt-4">
+                  <button 
+                    onClick={handleCancel} disabled={saving}
+                    className="px-6 py-2.5 bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors cursor-pointer"
+                    style={{ borderRadius: '1rem' }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleSave} disabled={saving}
+                    className="px-6 py-2.5 bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-sm active:scale-95 transition-all cursor-pointer flex items-center gap-2"
+                    style={{ borderRadius: '1rem' }}
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Display Mode Grid - Left Aligned for Readability */
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Full Name</span>
+                  <p className="text-lg font-semibold text-slate-900">{displayName || 'Not provided'}</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Email</span>
+                  <p className="text-lg font-semibold text-slate-900">{user?.email ?? 'Not provided'}</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Phone</span>
+                  <p className="text-lg font-semibold text-slate-900">{phone}</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Address</span>
+                  <p className="text-lg font-semibold text-slate-900">{address}</p>
+                </div>
+              </div>
             )}
           </div>
 
-          {editing ? (
-            <div className="w-full max-w-xl space-y-4">
-              <Input
-                label="Full Name"
-                value={editForm.displayName}
-                onChange={updateField('displayName')}
-                placeholder="Your full name"
-                required
-                fullWidth
-              />
-              <Input
-                label="Phone Number"
-                value={editForm.phone}
-                onChange={updateField('phone')}
-                placeholder="(555) 123-4567"
-                fullWidth
-              />
-              <Input
-                label="Address"
-                value={editForm.address}
-                onChange={updateField('address')}
-                placeholder="123 Main St, City, ST 12345"
-                fullWidth
-              />
-              <div className="flex gap-3 justify-end pt-2">
-                <Button variant="secondary" size="sm" onClick={handleCancel} disabled={saving}>
-                  Cancel
-                </Button>
-                <Button size="sm" onClick={handleSave} loading={saving}>
-                  Save Changes
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl mx-auto">
-              <div className="block">
-                <span className="text-sm font-semibold text-slate-700">Full Name</span>
-                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                  {displayName || 'Not provided'}
-                </p>
-              </div>
-              <div className="block">
-                <span className="text-sm font-semibold text-slate-700">Email</span>
-                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                  {user?.email ?? 'Not provided'}
-                </p>
-              </div>
-              <div className="block">
-                <span className="text-sm font-semibold text-slate-700">Phone</span>
-                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                  {phone}
-                </p>
-              </div>
-              <div className="block">
-                <span className="text-sm font-semibold text-slate-700">Address</span>
-                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                  {address}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+          {/* 4. SMS MFA Section (Wrapped in a matching card) */}
+          <div 
+            className="bg-white border border-slate-200 shadow-sm flex flex-col"
+            style={{ borderRadius: '2rem', padding: '3rem' }}
+          >
+            <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Two-Factor Authentication
+            </h3>
+            <MfaEnrollment userPhone={initial.phone} />
+          </div>
 
-        {/* SMS MFA Section */}
-        <MfaEnrollment userPhone={initial.phone} />
-
-        {/* Assessment History */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center w-full flex flex-col items-center">
-          <h3 className="text-lg font-bold text-slate-900 mb-6">Assessment History</h3>
-          {assessments.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-4xl mb-2">📋</p>
-              <p className="text-sm text-slate-500">No assessments yet. Start your first one!</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {assessments.map(a => (
-                <div key={a.id} className="flex items-center justify-between py-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{a.name}</p>
-                    <p className="text-xs text-slate-500">
-                      {new Date(a.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      {a.address && ` · ${a.address}`}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                    <span className={`status-pill border text-xs ${
-                      a.status === 'completed'
-                        ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                        : 'bg-amber-100 text-amber-700 border-amber-200'
-                    }`}>
-                      {a.status === 'completed' ? `${a.score ?? 0}%` : a.status}
-                    </span>
-                    {a.status === 'completed' && (
-                      <button
-                        onClick={() => navigate(`/report/${a.id}`)}
-                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
-                      >
-                        View
-                      </button>
-                    )}
-                  </div>
+          {/* 5. ASSESSMENT HISTORY CARD */}
+          <div 
+            className="bg-white border border-slate-200 shadow-sm flex flex-col"
+            style={{ borderRadius: '2rem', padding: '3rem' }}
+          >
+            <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Assessment History
+            </h3>
+            
+            {assessments.length === 0 ? (
+              <div className="text-center py-10 flex flex-col items-center">
+                <div className="w-16 h-16 bg-slate-50 text-slate-300 flex items-center justify-center rounded-2xl mb-4">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                 </div>
-              ))}
-            </div>
-          )}
+                <p className="text-lg font-bold text-slate-600">No assessments yet</p>
+                <p className="text-sm text-slate-500 mt-1">Start your first inspection to see it here.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {assessments.map(a => (
+                  <div key={a.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors" style={{ borderRadius: '1.25rem', gap: '1rem' }}>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-lg font-bold text-slate-900 truncate">{a.name}</p>
+                      <p className="text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-2">
+                        <span className="flex items-center gap-1">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                          {new Date(a.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                        {a.address && (
+                          <>
+                            <span className="text-slate-300">•</span>
+                            <span className="truncate">{a.address}</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className={`px-3 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider border ${
+                        a.status === 'completed'
+                          ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                          : 'bg-amber-100 text-amber-700 border-amber-200'
+                      }`}>
+                        {a.status === 'completed' ? `Score: ${a.score ?? 0}%` : 'In Progress'}
+                      </span>
+                      
+                      {a.status === 'completed' && (
+                        <button
+                          onClick={() => navigate(`/report/${a.id}`)}
+                          className="px-4 py-1.5 bg-white border border-emerald-200 text-emerald-700 font-bold text-sm rounded-lg hover:bg-emerald-50 transition-colors shadow-sm"
+                        >
+                          View Report
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
         </div>
       </div>
     </AppShell>
