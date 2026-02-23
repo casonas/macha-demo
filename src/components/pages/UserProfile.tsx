@@ -1,20 +1,69 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import AppShell from '../layout/AppShell';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { getProfile, listAssessments } from '../../services/data';
+import { getProfile, saveProfile, listAssessments } from '../../services/data';
+import { Button } from '../atoms/Button';
+import { Input } from '../atoms/Input';
+import { MfaEnrollment } from '../molecules/MfaEnrollment';
 import './pages.css';
 
 export const UserProfile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateProfile: updateAuthProfile } = useAuth();
   const navigate = useNavigate();
   const initial = getProfile();
   const displayName = user?.displayName || initial.displayName || '';
   const phone = initial.phone || 'Not provided';
   const address = initial.address || 'Not provided';
 
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    displayName: displayName,
+    phone: initial.phone || '',
+    address: initial.address || '',
+  });
+  const [saving, setSaving] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+
   const assessments = useMemo(() => listAssessments(), []);
   const userId = user?.id || initial.userId || 'N/A';
+
+  const handleEdit = useCallback(() => {
+    setEditForm({
+      displayName: displayName,
+      phone: initial.phone || '',
+      address: initial.address || '',
+    });
+    setEditing(true);
+    setSuccessMsg('');
+  }, [displayName, initial.phone, initial.address]);
+
+  const handleCancel = useCallback(() => {
+    setEditing(false);
+    setSuccessMsg('');
+  }, []);
+
+  const handleSave = useCallback(async () => {
+    if (!editForm.displayName.trim()) return;
+    setSaving(true);
+    try {
+      await updateAuthProfile(editForm.displayName.trim());
+      saveProfile({
+        displayName: editForm.displayName.trim(),
+        phone: editForm.phone.trim() || undefined,
+        address: editForm.address.trim() || undefined,
+        userId,
+      });
+      setEditing(false);
+      setSuccessMsg('Profile updated successfully.');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } finally {
+      setSaving(false);
+    }
+  }, [editForm, updateAuthProfile, userId]);
+
+  const updateField = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setEditForm(prev => ({ ...prev, [field]: e.target.value }));
 
   return (
     <AppShell title="My Profile">
@@ -33,36 +82,89 @@ export const UserProfile: React.FC = () => {
           </div>
         </div>
 
+        {/* Success Message */}
+        {successMsg && (
+          <div className="w-full rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-3 text-center">
+            {successMsg}
+          </div>
+        )}
+
         {/* Account Details Card */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center w-full flex flex-col items-center">
-          <h3 className="text-lg font-bold text-slate-900 mb-6">Account Details</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl mx-auto">
-            <div className="block">
-              <span className="text-sm font-semibold text-slate-700">Full Name</span>
-              <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                {displayName || 'Not provided'}
-              </p>
-            </div>
-            <div className="block">
-              <span className="text-sm font-semibold text-slate-700">Email</span>
-              <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                {user?.email ?? 'Not provided'}
-              </p>
-            </div>
-            <div className="block">
-              <span className="text-sm font-semibold text-slate-700">Phone</span>
-              <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                {phone}
-              </p>
-            </div>
-            <div className="block">
-              <span className="text-sm font-semibold text-slate-700">Address</span>
-              <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
-                {address}
-              </p>
-            </div>
+          <div className="flex items-center justify-between w-full max-w-xl mb-6">
+            <h3 className="text-lg font-bold text-slate-900">Account Details</h3>
+            {!editing && (
+              <Button variant="ghost" size="sm" onClick={handleEdit}>
+                ✏️ Edit Profile
+              </Button>
+            )}
           </div>
+
+          {editing ? (
+            <div className="w-full max-w-xl space-y-4">
+              <Input
+                label="Full Name"
+                value={editForm.displayName}
+                onChange={updateField('displayName')}
+                placeholder="Your full name"
+                required
+                fullWidth
+              />
+              <Input
+                label="Phone Number"
+                value={editForm.phone}
+                onChange={updateField('phone')}
+                placeholder="(555) 123-4567"
+                fullWidth
+              />
+              <Input
+                label="Address"
+                value={editForm.address}
+                onChange={updateField('address')}
+                placeholder="123 Main St, City, ST 12345"
+                fullWidth
+              />
+              <div className="flex gap-3 justify-end pt-2">
+                <Button variant="secondary" size="sm" onClick={handleCancel} disabled={saving}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={handleSave} loading={saving}>
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl mx-auto">
+              <div className="block">
+                <span className="text-sm font-semibold text-slate-700">Full Name</span>
+                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
+                  {displayName || 'Not provided'}
+                </p>
+              </div>
+              <div className="block">
+                <span className="text-sm font-semibold text-slate-700">Email</span>
+                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
+                  {user?.email ?? 'Not provided'}
+                </p>
+              </div>
+              <div className="block">
+                <span className="text-sm font-semibold text-slate-700">Phone</span>
+                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
+                  {phone}
+                </p>
+              </div>
+              <div className="block">
+                <span className="text-sm font-semibold text-slate-700">Address</span>
+                <p className="mt-1.5 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-900 text-center">
+                  {address}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* SMS MFA Section */}
+        <MfaEnrollment userPhone={initial.phone} />
 
         {/* Assessment History */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center w-full flex flex-col items-center">

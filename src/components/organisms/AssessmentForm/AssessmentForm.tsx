@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react';
-import { Category, Question } from '../../../types/assessment';
+import { Question } from '../../../types/assessment';
 import { useAssessment, useAssessmentResponse } from '../../../hooks/useAssessment';
 import { QuestionCard } from '../../molecules/QuestionCard';
 import { Button } from '../../atoms/Button';
@@ -35,38 +35,14 @@ const [selectedSubsection, setSelectedSubsection] = useState('All');
 const chipsRef = useRef<HTMLDivElement | null>(null);
 const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-const validateCategory = useCallback(
-(category: Category): boolean => {
-const errors: Record<string, string> = {};
-let isValid = true;
-
-category.questions.forEach((question) => {
-if (question.required) {
-const value = getResponse(question.id);
-if (value === undefined || value === null || value === '') {
-errors[question.id] = 'This question is required';
-isValid = false;
-}
-}
-});
-
-setValidationErrors(errors);
-return isValid;
-},
-[getResponse]
-);
-
 const handleNext = useCallback(() => {
 if (!assessment) return;
-const current = assessment.categories[activeCategory];
-if (!current) return;
-
-if (validateCategory(current) && activeCategory < assessment.categories.length - 1) {
+if (activeCategory < assessment.categories.length - 1) {
 setActiveCategory((prev) => prev + 1);
 setSelectedSubsection('All');
 setValidationErrors({});
 }
-}, [assessment, activeCategory, validateCategory]);
+}, [assessment, activeCategory]);
 
 const handlePrevious = useCallback(() => {
 if (activeCategory > 0) {
@@ -83,12 +59,11 @@ onSave?.(responses);
 const handleSubmit = useCallback(async () => {
 if (!assessment) return;
 
-let allValid = true;
-assessment.categories.forEach((category) => {
-if (!validateCategory(category)) allValid = false;
-});
-
-if (!allValid) return;
+const answeredAny = Object.values(responses).some(v => v !== '' && v !== null && v !== undefined);
+if (!answeredAny) {
+setValidationErrors({ __formError: 'Please answer at least one question before submitting.' });
+return;
+}
 
 setIsSubmitting(true);
 try {
@@ -96,7 +71,7 @@ await onSubmit?.(responses);
 } finally {
 setIsSubmitting(false);
 }
-}, [assessment, onSubmit, responses, validateCategory]);
+}, [assessment, onSubmit, responses]);
 
 const categoryProgress = useMemo(() => {
 if (!assessment) return [];
