@@ -40,7 +40,7 @@ export const CreateAccount: React.FC = () => {
       setError('Full name, email, phone number, and password are required.');
       return;
     }
-    if (!/^\+?[\d\s().,-]{7,}$/.test(form.phone.trim())) {
+    if (!/^\+?[\d\s().-]{7,15}$/.test(form.phone.trim())) {
       setError('Please enter a valid phone number.');
       return;
     }

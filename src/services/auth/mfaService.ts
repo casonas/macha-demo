@@ -54,7 +54,7 @@ export async function startMfaEnrollment(phoneNumber: string): Promise<string> {
   const user = getFirebaseAuth().currentUser;
   if (!user) throw new Error('No authenticated user');
 
-  if (!recaptchaVerifier) throw new Error('Recaptcha not initialised. Call initRecaptcha() first.');
+  if (!recaptchaVerifier) throw new Error('Recaptcha not initialized. Call initRecaptcha() first.');
 
   const session = await multiFactor(user).getSession();
   const phoneInfoOptions = { phoneNumber, session };
@@ -87,7 +87,7 @@ export async function completeMfaEnrollment(verificationId: string, smsCode: str
  * Called when login throws `auth/multi-factor-auth-required`.
  */
 export async function startMfaSignIn(resolver: MultiFactorResolver): Promise<string> {
-  if (!recaptchaVerifier) throw new Error('Recaptcha not initialised.');
+  if (!recaptchaVerifier) throw new Error('Recaptcha not initialized.');
 
   const phoneInfoOptions = {
     multiFactorHint: resolver.hints[0],

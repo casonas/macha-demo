@@ -61,7 +61,7 @@ if (!assessment) return;
 
 const answeredAny = Object.values(responses).some(v => v !== '' && v !== null && v !== undefined);
 if (!answeredAny) {
-setValidationErrors({ _form: 'Please answer at least one question before submitting.' });
+setValidationErrors({ __formError: 'Please answer at least one question before submitting.' });
 return;
 }
 
