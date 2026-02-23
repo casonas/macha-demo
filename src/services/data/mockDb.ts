@@ -27,6 +27,7 @@ const ASSESS_KEY = 'macha.assessments';
 const ACTIVE_KEY = 'macha.activeAssessmentId';
 const PROFILE_KEY = 'macha.profile';
 
+// Match the same default as authService.ts — set REACT_APP_DATA_PROVIDER=local for offline development
 const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
 
 function now() {

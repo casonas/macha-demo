@@ -12,21 +12,14 @@ function getRiskLevel(score: number) {
 }
 
 function countFindings(responses: Record<string, any>) {
-  let high = 0, significant = 0, moderate = 0, low = 0;
+  let total = 0;
   Object.entries(responses).forEach(([key, value]) => {
-    if (key.endsWith('Comment') || value === true || value === 'Yes') return;
+    if (key.endsWith('Comment')) return;
     if (value === false || value === 'No') {
-      // Distribute findings across severity levels for demonstration
-      const hash = key.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-      switch (hash % 4) {
-        case 0: high++; break;
-        case 1: significant++; break;
-        case 2: moderate++; break;
-        default: low++; break;
-      }
+      total++;
     }
   });
-  return { high, significant, moderate, low };
+  return { total };
 }
 
 export const ReportView: React.FC = () => {
@@ -47,7 +40,6 @@ export const ReportView: React.FC = () => {
   const risk = getRiskLevel(assessment.score ?? 0);
   const dateStr = new Date(assessment.updatedAt || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const findings = countFindings(assessment.responses || {});
-  const totalFindings = findings.high + findings.significant + findings.moderate + findings.low;
 
   // Collect all photos from the assessment
   const allPhotos: { questionId: string; name: string; dataUrl: string }[] = [];
@@ -157,29 +149,22 @@ export const ReportView: React.FC = () => {
                 <h3 className="report-summary-item__number">7) Observations (Findings):</h3>
                 <div className="report-findings-grid">
                   <div className="report-finding-box">
-                    <span className="report-finding-box__label">High</span>
-                    <span className="report-finding-box__count">{findings.high}</span>
+                    <span className="report-finding-box__label">Total Findings</span>
+                    <span className="report-finding-box__count">{findings.total}</span>
                   </div>
                   <div className="report-finding-box">
-                    <span className="report-finding-box__label">Significant</span>
-                    <span className="report-finding-box__count">{findings.significant}</span>
+                    <span className="report-finding-box__label">Risk Rating</span>
+                    <span className="report-finding-box__count">{risk.label}</span>
                   </div>
                   <div className="report-finding-box">
-                    <span className="report-finding-box__label">Moderate</span>
-                    <span className="report-finding-box__count">{findings.moderate}</span>
-                  </div>
-                  <div className="report-finding-box">
-                    <span className="report-finding-box__label">Low</span>
-                    <span className="report-finding-box__count">{findings.low}</span>
+                    <span className="report-finding-box__label">Score</span>
+                    <span className="report-finding-box__count">{assessment.score ?? 0}%</span>
                   </div>
                 </div>
-                <p className="report-body-text" style={{ marginTop: '0.75rem' }}>
-                  Total findings: {totalFindings}. Overall risk rating: <strong>{risk.label}</strong>. Assessment score: <strong>{assessment.score ?? 0}%</strong>.
-                </p>
               </div>
 
               {/* Detailed Findings */}
-              {totalFindings > 0 && (
+              {findings.total > 0 && (
                 <div className="report-summary-item">
                   <h3 className="report-summary-item__number">Detailed Findings:</h3>
                   <div className="report-findings-list">
