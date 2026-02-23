@@ -183,3 +183,24 @@ grid-template-columns: 1fr;
     background: white !important;
   }
 }
+.dash-wrapper {
+  padding: 4rem 2rem !important; /* Pushes the whole dashboard off the top edge */
+}
+.dash-hero {
+  padding: 6rem 2rem !important; /* Forces massive space above/below the Hero text */
+  border-radius: 2rem !important;
+}
+.dash-kpis {
+  margin-top: 5rem !important; /* Huge gap ABOVE the 4 tabs */
+  margin-bottom: 5rem !important; /* Huge gap BELOW the 4 tabs */
+}
+.dash-kpi-card {
+  min-height: 180px !important; /* Makes the 4 tabs significantly taller */
+  padding: 2rem !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.dash-bottom-cards {
+  min-height: 600px !important; /* Stretches the bottom cards to fill the page */
+}
