@@ -9,7 +9,7 @@ import './AssessmentForm.css';
 interface AssessmentFormProps {
 assessmentId: string;
 buildingId: string;
-onSubmit?: (responses: Record<string, any>) => void;
+onSubmit?: (responses: Record<string, any>, photos: Record<string, { name: string; dataUrl: string }[]>) => void;
 onSave?: (responses: Record<string, any>) => void;
 initialData?: Record<string, any>;
 }
@@ -23,7 +23,7 @@ onSave,
 initialData
 }: AssessmentFormProps): JSX.Element => {
 const { assessment, loading, error } = useAssessment(assessmentId);
-const { responses, updateResponse, updateComment, getResponse, getComment, getPhotos, updatePhotos } =
+const { responses, updateResponse, updateComment, getResponse, getComment, getPhotos, updatePhotos, photos } =
 useAssessmentResponse(initialData);
 
 const [activeCategory, setActiveCategory] = useState<number>(0);
@@ -67,11 +67,11 @@ return;
 
 setIsSubmitting(true);
 try {
-await onSubmit?.(responses);
+await onSubmit?.(responses, photos);
 } finally {
 setIsSubmitting(false);
 }
-}, [assessment, onSubmit, responses]);
+}, [assessment, onSubmit, responses, photos]);
 
 const categoryProgress = useMemo(() => {
 if (!assessment) return [];

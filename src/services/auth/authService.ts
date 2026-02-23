@@ -15,7 +15,8 @@ import {
   signInWithPopup,
   type User as FirebaseUser
 } from 'firebase/auth';
-import { getFirebaseAuth } from '../firebaseConfig';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirebaseAuth, getFirebaseDb } from '../firebaseConfig';
 
 const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
 
@@ -75,6 +76,30 @@ function firebaseUserToUser(fbUser: FirebaseUser): User {
     roles: ['user'],
     assignedBuildings: ['building-001']
   };
+}
+
+async function saveUserProfileToFirestore(fbUser: FirebaseUser, extra?: { phone?: string; organization?: string; address?: string }) {
+  if (!USE_FIREBASE) return;
+  try {
+    const db = getFirebaseDb();
+    const userRef = doc(db, 'users', fbUser.uid);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        uid: fbUser.uid,
+        email: fbUser.email || '',
+        displayName: fbUser.displayName || '',
+        phone: extra?.phone || '',
+        organization: extra?.organization || '',
+        address: extra?.address || '',
+        roles: ['user'],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+    }
+  } catch (err) {
+    console.error('Failed to save user profile to Firestore:', err);
+  }
 }
 
 function setSession(user: User) {
@@ -147,15 +172,17 @@ export async function loginWithGoogle(): Promise<User> {
   }
   const provider = new GoogleAuthProvider();
   const cred = await signInWithPopup(getFirebaseAuth(), provider);
+  await saveUserProfileToFirestore(cred.user);
   const user = firebaseUserToUser(cred.user);
   notifyListeners(user);
   return user;
 }
 
-export async function register(input: { displayName: string; email: string; password: string }): Promise<User> {
+export async function register(input: { displayName: string; email: string; password: string; phone?: string; organization?: string; address?: string }): Promise<User> {
   if (USE_FIREBASE) {
     const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), input.email, input.password);
     await updateProfile(cred.user, { displayName: input.displayName });
+    await saveUserProfileToFirestore(cred.user, { phone: input.phone, organization: input.organization, address: input.address });
     const user = firebaseUserToUser({ ...cred.user, displayName: input.displayName });
     notifyListeners(user);
     return user;

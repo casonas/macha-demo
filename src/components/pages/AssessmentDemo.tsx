@@ -13,8 +13,8 @@ const assessmentId = record?.assessmentId || 'school-security-v1';
 const buildingId = record?.buildingId || 'building-001';
 const savedResponses = record?.responses || {};
 
-const handleSubmit = async (responses: Record<string, any>) => {
-completeAssessment(recordId, responses);
+const handleSubmit = async (responses: Record<string, any>, photos: Record<string, { name: string; dataUrl: string }[]>) => {
+completeAssessment(recordId, responses, photos);
 alert('Assessment submitted successfully.');
 };
 

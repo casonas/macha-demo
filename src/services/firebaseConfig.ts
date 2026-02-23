@@ -1,5 +1,7 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 // Client-side Firebase config — these keys are designed to be public per Firebase docs.
 // Security is enforced by Firestore Security Rules, not by keeping these keys secret.
@@ -14,6 +16,8 @@ export const firebaseConfig = {
 
 let _app: FirebaseApp | null = null;
 let _auth: Auth | null = null;
+let _db: Firestore | null = null;
+let _storage: FirebaseStorage | null = null;
 
 function getApp(): FirebaseApp {
   if (!_app) {
@@ -27,4 +31,18 @@ export function getFirebaseAuth(): Auth {
     _auth = getAuth(getApp());
   }
   return _auth;
+}
+
+export function getFirebaseDb(): Firestore {
+  if (!_db) {
+    _db = getFirestore(getApp());
+  }
+  return _db;
+}
+
+export function getFirebaseStorage(): FirebaseStorage {
+  if (!_storage) {
+    _storage = getStorage(getApp());
+  }
+  return _storage;
 }
