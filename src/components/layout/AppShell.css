@@ -122,3 +122,13 @@
 @media (max-width: 960px) {
   .shell--open .shell__sidebar { transform: translateX(0); transition: transform 220ms ease; }
 }
+.shell__main--dashboard {
+  padding: 0;
+}
+.shell__content--dashboard {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  max-width: 100%;
+}
