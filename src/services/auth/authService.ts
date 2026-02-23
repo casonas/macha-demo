@@ -132,12 +132,34 @@ export function subscribeToAuthState(listener: AuthStateListener): () => void {
   };
 }
 
+/**
+ * Custom error thrown when MFA verification is required during login.
+ */
+export class MfaRequiredError extends Error {
+  code = 'auth/multi-factor-auth-required';
+  resolver: any;
+  pendingUser: User | null;
+
+  constructor(resolver: any, pendingUser: User | null) {
+    super('Multi-factor authentication required.');
+    this.resolver = resolver;
+    this.pendingUser = pendingUser;
+  }
+}
+
 export async function login(email: string, password: string): Promise<User> {
   if (USE_FIREBASE) {
-    const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
-    const user = firebaseUserToUser(cred.user);
-    notifyListeners(user);
-    return user;
+    try {
+      const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+      const user = firebaseUserToUser(cred.user);
+      notifyListeners(user);
+      return user;
+    } catch (err: any) {
+      if (err?.code === 'auth/multi-factor-auth-required') {
+        throw new MfaRequiredError(err.resolver, null);
+      }
+      throw err;
+    }
   }
 
   // Mock login
@@ -161,9 +183,23 @@ export async function login(email: string, password: string): Promise<User> {
   }
 
   loginAttempts.delete(key);
+
+  // Check if MFA is enrolled in mock mode
+  if (localStorage.getItem('macha.mfaEnrolled') === 'true') {
+    throw new MfaRequiredError(null, record.user);
+  }
+
   setSession(record.user);
   notifyListeners(record.user);
   return record.user;
+}
+
+/**
+ * Complete login for a user who passed MFA verification (mock mode).
+ */
+export function completeMfaLogin(user: User): void {
+  setSession(user);
+  notifyListeners(user);
 }
 
 export async function loginWithGoogle(): Promise<User> {
