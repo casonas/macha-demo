@@ -57,11 +57,8 @@ export const HomeScreen: React.FC = () => {
   return (
     <AppShell title="Dashboard" isDashboard={true}>
       
-      <div 
-        className="w-full min-h-screen bg-slate-50/50 flex flex-col items-center"
-        style={{ paddingTop: '3rem', paddingBottom: '6rem', paddingLeft: '2rem', paddingRight: '2rem' }}
-      >
-        <div className="w-full max-w-7xl flex flex-col">
+      <div className="w-full min-h-screen bg-slate-50/50 py-12">
+        <div className="w-full max-w-7xl mx-auto flex flex-col px-4 sm:px-6 lg:px-8">
           
           {/* 1. HERO BANNER */}
           <div 
@@ -99,10 +96,7 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* 2. KPI TABS: Adjusted Margins, forced gap, fixed Total icon */}
-          <div 
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-            style={{ marginTop: '2.5rem', marginBottom: '2.5rem', gap: '2rem' }} 
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-10 mb-10 gap-6 lg:gap-8">
             {[
               { label: 'Total', val: total, color: 'bg-emerald-100 text-emerald-600', icon: <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></> },
               { label: 'Completed', val: completed, color: 'bg-blue-100 text-blue-600', icon: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></> },
@@ -126,56 +120,55 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* 3. BOTTOM CARDS: Forced gap and border-radius */}
-          <div 
-            className="grid grid-cols-1 lg:grid-cols-7 items-stretch pb-20"
-            style={{ gap: '2rem' }}
-          >
+          <div className="grid grid-cols-1 lg:grid-cols-3 items-stretch pb-20 gap-6 lg:gap-8">
             
             <div 
-              className="lg:col-span-5 bg-white border border-slate-200 shadow-sm flex flex-col"
+              className="lg:col-span-2 bg-white border border-slate-200 shadow-sm flex flex-col h-full"
               style={{ minHeight: '450px', padding: '3rem', borderRadius: '1.5rem' }}
             >
               <h3 className="text-xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Latest Assessment</h3>
               
               {lastAssessment ? (
-                <div className="flex-grow flex flex-col items-center justify-center gap-6 w-full">
-                  {lastAssessment.score != null && (
-                    <div className="w-56 h-56 flex-shrink-0">
-                      <ScoreGauge value={lastAssessment.score} />
+                <div className="flex-grow flex flex-col w-full">
+                  <div className="flex-grow flex flex-col items-center justify-center gap-6 w-full">
+                    {lastAssessment.score != null && (
+                      <div className="w-56 h-56 flex-shrink-0">
+                        <ScoreGauge value={lastAssessment.score} />
+                      </div>
+                    )}
+                    <div className="text-center w-full mt-4">
+                      <h4 className="text-3xl font-bold text-slate-900 mb-4 break-words" style={{ overflowWrap: 'anywhere' }}>{lastAssessment.name}</h4>
+                      <span className={`inline-block px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                        lastAssessment.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}>
+                        {lastAssessment.status}
+                      </span>
+                      
+                         <div className="mt-10 w-full max-w-lg mx-auto">
+                           <div className="flex justify-between text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">
+                             <span>{latestProgressLabel}</span>
+                             <span className="text-emerald-600">{latestProgress}%</span>
+                           </div>
+                           <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                             <div
+                               className={`h-full rounded-full transition-all duration-1000 ${lastAssessment.status === 'completed' ? 'bg-emerald-600' : 'bg-emerald-500'}`}
+                               style={{ width: `${latestProgress}%` }}
+                             />
+                           </div>
+                           <p className="mt-2 text-xs text-slate-500">
+                             {lastAssessment.status === 'completed' ? 'Report has been submitted.' : 'Save progress anytime and continue later.'}
+                           </p>
+                         </div>
+                      </div>
                     </div>
-                  )}
-                  <div className="text-center w-full mt-4">
-                    <h4 className="text-3xl font-bold text-slate-900 mb-4">{lastAssessment.name}</h4>
-                    <span className={`inline-block px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider border ${
-                      lastAssessment.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
-                    }`}>
-                      {lastAssessment.status}
-                    </span>
-                    
-                       <div className="mt-10 w-full max-w-lg mx-auto">
-                         <div className="flex justify-between text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">
-                           <span>{latestProgressLabel}</span>
-                           <span className="text-emerald-600">{latestProgress}%</span>
-                         </div>
-                         <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                           <div
-                             className={`h-full rounded-full transition-all duration-1000 ${lastAssessment.status === 'completed' ? 'bg-emerald-600' : 'bg-emerald-500'}`}
-                             style={{ width: `${latestProgress}%` }}
-                           />
-                         </div>
-                         <p className="mt-2 text-xs text-slate-500">
-                           {lastAssessment.status === 'completed' ? 'Report has been submitted.' : 'Save progress anytime and continue later.'}
-                         </p>
-                       </div>
-                     <button
-                       onClick={() => navigate(lastAssessment.status === 'completed' ? `/report/${lastAssessment.id}` : `/assessment?id=${encodeURIComponent(lastAssessment.id)}`)}
-                       className="mt-8 px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-sm active:scale-95"
-                     >
-                       {lastAssessment.status === 'completed' ? 'View Report' : 'Continue Assessment'}
-                     </button>
-                   </div>
-                 </div>
-               ) : (
+                  <button
+                    onClick={() => navigate(lastAssessment.status === 'completed' ? `/report/${lastAssessment.id}` : `/assessment?id=${encodeURIComponent(lastAssessment.id)}`)}
+                    className="mt-8 self-center px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-sm active:scale-95"
+                  >
+                    {lastAssessment.status === 'completed' ? 'View Report' : 'Continue Assessment'}
+                  </button>
+                </div>
+              ) : (
                 <div className="flex-grow flex flex-col items-center justify-center text-slate-400">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-6 opacity-30"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/></svg>
                   <p className="font-bold uppercase tracking-widest text-lg">No assessments found.</p>
@@ -184,7 +177,7 @@ export const HomeScreen: React.FC = () => {
             </div>
 
             <div 
-              className="lg:col-span-2 bg-white border border-slate-200 shadow-sm flex flex-col"
+              className="lg:col-span-1 bg-white border border-slate-200 shadow-sm flex flex-col h-full"
               style={{ minHeight: '450px', padding: '3rem', borderRadius: '1.5rem' }} 
             >
               <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-3">Quick Actions</h3>
