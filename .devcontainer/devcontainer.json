@@ -1,9 +1,9 @@
 {
   "name": "Macha Demo",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
 
   // Install dependencies and copy the env template on first launch
-  "postCreateCommand": "npm install && cp -n .env.example .env.local || true",
+  "postCreateCommand": "npm ci --no-audit --no-fund && cp -n .env.example .env.local || true",
 
   // Forward the React dev server port so you can open it in the browser
   "forwardPorts": [3000],

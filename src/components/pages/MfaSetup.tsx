@@ -49,6 +49,7 @@ export const MfaSetup: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const autoResendAttemptedRef = useRef(false);
 
   // Check email verification status and MFA enrollment on mount
   useEffect(() => {
@@ -66,6 +67,16 @@ export const MfaSetup: React.FC = () => {
     if (step === 'phone' && recaptchaRef.current) {
       initRecaptcha('mfa-setup-recaptcha');
     }
+  }, [step]);
+
+  useEffect(() => {
+    if (step !== 'email-verify' || autoResendAttemptedRef.current) return;
+    autoResendAttemptedRef.current = true;
+    resendEmailVerification()
+      .then(() => setEmailSent(true))
+      .catch(() => {
+        // keep UI usable even if auto-resend fails; user can still resend manually
+      });
   }, [step]);
 
   /**
@@ -181,8 +192,8 @@ export const MfaSetup: React.FC = () => {
               </div>
             ) : (
               <p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.92rem', margin: 0 }}>
-                A verification email was sent when you created your account.
-                If you didn't receive it, click the button below to resend.
+                We just sent a fresh verification email to <strong>{user?.email}</strong>.
+                If you still don't receive it, click the button below to resend.
               </p>
             )}
             <Button
