@@ -28,8 +28,8 @@ const ACTIVE_KEY = 'macha.activeAssessmentId';
 const PROFILE_KEY = 'macha.profile';
 const CURRENT_USER_KEY = 'macha.currentUserId';
 
-// Match the same default as authService.ts — set REACT_APP_DATA_PROVIDER=firebase to use Firestore
-const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'local') === 'firebase';
+// Match the same default as authService.ts — set REACT_APP_DATA_PROVIDER=local for offline development
+const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
 
 function now() {
   return new Date().toISOString();

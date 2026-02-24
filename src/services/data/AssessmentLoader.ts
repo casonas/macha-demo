@@ -19,7 +19,7 @@ import { getFirestore, collection, query, where, getDocs } from 'firebase/firest
 import { firebaseConfig } from '../firebaseConfig';
 
 const DATA_BASE_PATH = '/data';
-const DATA_PROVIDER = process.env.REACT_APP_DATA_PROVIDER || 'local';
+const DATA_PROVIDER = process.env.REACT_APP_DATA_PROVIDER || 'firebase';
 
 // Two-tier cache: in-memory + localStorage for persistence across page reloads
 const cache = new Map<string, any>();

@@ -2,7 +2,6 @@ import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
-import { getDatabase, type Database } from 'firebase/database';
 
 // Client-side Firebase config — loaded from environment variables.
 // Copy .env.example to .env.local and fill in your project values.
@@ -10,7 +9,6 @@ import { getDatabase, type Database } from 'firebase/database';
 export const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY || '',
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || '',
-  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL || '',
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || '',
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || '',
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || '',
@@ -27,7 +25,6 @@ let _app: FirebaseApp | null = null;
 let _auth: Auth | null = null;
 let _db: Firestore | null = null;
 let _storage: FirebaseStorage | null = null;
-let _rtdb: Database | null = null;
 
 function getApp(): FirebaseApp {
   if (!_app) {
@@ -55,11 +52,4 @@ export function getFirebaseStorage(): FirebaseStorage {
     _storage = getStorage(getApp());
   }
   return _storage;
-}
-
-export function getFirebaseRtdb(): Database {
-  if (!_rtdb) {
-    _rtdb = getDatabase(getApp());
-  }
-  return _rtdb;
 }
