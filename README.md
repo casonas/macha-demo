@@ -19,6 +19,24 @@ You can open and run this project entirely in the browser using **GitHub Codespa
 
 > **Tip:** Codespaces is free for personal accounts up to 60 hours/month. You can stop or delete a Codespace at any time from the Codespaces tab.
 
+### Fast GitHub Workflow (No Re-Download Each Change)
+
+1. Create **one** Codespace once (same branch each time).
+2. After that, use **Resume Codespace** instead of creating a new one.
+3. In terminal, run:
+   ```bash
+   git pull
+   npm start
+   ```
+4. Make edits, test, and commit from that same Codespace.
+5. Next session, resume the same Codespace again (your files and installed `node_modules` stay there).
+
+If Codespaces RAM is high:
+- Use a **2-core or 4-core** machine size (avoid larger unless needed).
+- Keep only one dev server running.
+- Close unused browser preview tabs and VS Code extensions.
+- Rebuild container only when dependencies or devcontainer settings change.
+
 ## Local Quick Start
 
 ```bash
