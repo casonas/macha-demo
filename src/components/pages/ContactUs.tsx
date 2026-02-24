@@ -3,11 +3,7 @@ import AppShell from '../layout/AppShell';
 import './pages.css';
 
 export const ContactUs: React.FC = () => {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
-
-  const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm(prev => ({ ...prev, [field]: e.target.value }));
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
