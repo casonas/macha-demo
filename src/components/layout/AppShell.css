@@ -23,6 +23,10 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
 }
 
 /* Mobile toggle button (hidden on desktop) */
@@ -45,7 +49,7 @@
 /* small helper for KPIs and cards */
 .kpi--macha { background: linear-gradient(180deg, rgba(6,78,59,0.06), rgba(6,78,59,0.02)); }
 
-.shell__nav { display: flex; flex-direction: column; gap: .45rem; }
+.shell__nav { display: flex; flex-direction: column; gap: .45rem; flex-shrink: 0; }
 .shell__link {
   color: #cbd5e1;
   text-decoration: none;
@@ -56,7 +60,7 @@
 .shell__link:hover { background: rgba(34, 139, 34, 0.1); }
 .shell__link--active { background: rgba(34, 139, 34, 0.25); color: #f0fdf4; }
 
-.shell__user { margin-top: auto; border-top: 1px solid rgba(148,163,184,.25); padding-top: .9rem; }
+.shell__user { margin-top: auto; border-top: 1px solid rgba(148,163,184,.25); padding-top: .9rem; flex-shrink: 0; }
 .shell__user-name { margin: 0; font-weight: 700; }
 .shell__user-email { margin: .2rem 0 .7rem; color: #94a3b8; font-size: .85rem; }
 .shell__logout {
