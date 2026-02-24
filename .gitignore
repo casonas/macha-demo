@@ -13,3 +13,6 @@ yarn-error.log*
 # Firebase service account keys — NEVER commit these
 serviceAccountKey.json
 **/serviceAccountKey*.json
+
+# Cloud Functions dependencies
+functions/node_modules

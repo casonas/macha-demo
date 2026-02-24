@@ -10,10 +10,13 @@ import {
   signOut,
   updateProfile,
   sendPasswordResetEmail,
+  sendEmailVerification,
+  signInWithCustomToken as firebaseSignInWithCustomToken,
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
-  type User as FirebaseUser
+  type User as FirebaseUser,
+  type ActionCodeSettings
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { getFirebaseAuth, getFirebaseDb } from '../firebaseConfig';
@@ -54,6 +57,44 @@ function firebaseUserToUser(fbUser: FirebaseUser): User {
     displayName: fbUser.displayName || '',
     roles: ['user'],
     assignedBuildings: ['building-001']
+  };
+}
+
+/**
+ * Fetch user roles from Firestore and return an enriched User object.
+ */
+async function enrichUserWithRoles(fbUser: FirebaseUser): Promise<User> {
+  const base = firebaseUserToUser(fbUser);
+  if (!USE_FIREBASE) return base;
+  try {
+    const db = getFirebaseDb();
+    const snap = await getDoc(doc(db, 'users', fbUser.uid));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.roles) && data.roles.length > 0) {
+        base.roles = data.roles;
+      }
+      if (Array.isArray(data.assignedBuildings) && data.assignedBuildings.length > 0) {
+        base.assignedBuildings = data.assignedBuildings;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch user roles from Firestore:', err);
+  }
+  return base;
+}
+
+/**
+ * Build ActionCodeSettings for email actions (verification, password reset).
+ * These settings direct the user back to the app without relying on Firebase Dynamic Links.
+ */
+function getActionCodeSettings(): ActionCodeSettings {
+  const url = process.env.REACT_APP_FIREBASE_AUTH_DOMAIN
+    ? `https://${process.env.REACT_APP_FIREBASE_AUTH_DOMAIN}`
+    : window.location.origin;
+  return {
+    url,
+    handleCodeInApp: false,
   };
 }
 
@@ -130,7 +171,7 @@ export async function login(email: string, password: string): Promise<User> {
   if (USE_FIREBASE) {
     try {
       const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
-      const user = firebaseUserToUser(cred.user);
+      const user = await enrichUserWithRoles(cred.user);
       notifyListeners(user);
       return user;
     } catch (err: any) {
@@ -189,7 +230,7 @@ export async function loginWithGoogle(): Promise<User> {
     const provider = new GoogleAuthProvider();
     const cred = await signInWithPopup(getFirebaseAuth(), provider);
     await saveUserProfileToFirestore(cred.user);
-    const user = firebaseUserToUser(cred.user);
+    const user = await enrichUserWithRoles(cred.user);
     notifyListeners(user);
     return user;
   } catch (err: any) {
@@ -205,6 +246,13 @@ export async function register(input: { displayName: string; email: string; pass
     const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), input.email, input.password);
     await updateProfile(cred.user, { displayName: input.displayName });
     await saveUserProfileToFirestore(cred.user, { phone: input.phone, organization: input.organization, address: input.address });
+    // Send email verification so the user can verify before enrolling MFA.
+    // Uses ActionCodeSettings that do not rely on Firebase Dynamic Links.
+    try {
+      await sendEmailVerification(cred.user, getActionCodeSettings());
+    } catch (err) {
+      console.error('Failed to send email verification:', err);
+    }
     const user = firebaseUserToUser({ ...cred.user, displayName: input.displayName });
     notifyListeners(user);
     return user;
@@ -242,7 +290,7 @@ export async function register(input: { displayName: string; email: string; pass
 
 export async function requestPasswordReset(email: string): Promise<void> {
   if (USE_FIREBASE) {
-    await sendPasswordResetEmail(getFirebaseAuth(), email);
+    await sendPasswordResetEmail(getFirebaseAuth(), email, getActionCodeSettings());
     return;
   }
   await new Promise(resolve => setTimeout(resolve, 400));
@@ -314,6 +362,44 @@ export async function isAuthenticated(): Promise<boolean> {
 export async function hasRole(role: string): Promise<boolean> {
   const user = await getCurrentUser();
   return user?.roles.includes(role as any) || false;
+}
+
+/**
+ * Check whether the current Firebase user's email has been verified.
+ * Returns true in mock mode since no real verification is needed.
+ */
+export function isEmailVerified(): boolean {
+  if (!USE_FIREBASE) return true;
+  const fbUser = getFirebaseAuth().currentUser;
+  return fbUser?.emailVerified ?? false;
+}
+
+/**
+ * Re-send the email verification link for the current user.
+ * Uses ActionCodeSettings that do not rely on Firebase Dynamic Links.
+ */
+export async function resendEmailVerification(): Promise<void> {
+  if (!USE_FIREBASE) return;
+  const fbUser = getFirebaseAuth().currentUser;
+  if (!fbUser) throw new Error('No authenticated user');
+  if (fbUser.emailVerified) return;
+  await sendEmailVerification(fbUser, getActionCodeSettings());
+}
+
+/**
+ * Sign in using a Firebase custom authentication token.
+ * Used for Firebase Phone Number Verification (PNV) token exchange flow
+ * where a backend endpoint validates the PNV token and returns a custom token.
+ */
+export async function signInWithCustomToken(customToken: string): Promise<User> {
+  if (!USE_FIREBASE) {
+    throw new Error('Custom token sign-in is only available with Firebase.');
+  }
+  const cred = await firebaseSignInWithCustomToken(getFirebaseAuth(), customToken);
+  await saveUserProfileToFirestore(cred.user);
+  const user = await enrichUserWithRoles(cred.user);
+  notifyListeners(user);
+  return user;
 }
 
 export async function refreshSession(): Promise<void> {
