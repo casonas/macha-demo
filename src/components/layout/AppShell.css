@@ -13,7 +13,7 @@
   display: grid;
   grid-template-columns: 280px 1fr;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f4f0 0%, #e2e8e2 100%);
+  background: linear-gradient(to right, #050805 0 280px, #f0f4f0 280px, #e2e8e2 100%);
 }
 
 .shell__sidebar {
@@ -26,7 +26,7 @@
   height: 100dvh;
   position: sticky;
   top: 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 /* Mobile toggle button (hidden on desktop) */
@@ -49,7 +49,7 @@
 /* small helper for KPIs and cards */
 .kpi--macha { background: linear-gradient(180deg, rgba(6,78,59,0.06), rgba(6,78,59,0.02)); }
 
-.shell__nav { display: flex; flex-direction: column; gap: .45rem; flex-shrink: 0; }
+.shell__nav { display: flex; flex-direction: column; gap: .45rem; flex: 1; min-height: 0; overflow-y: auto; padding-right: .2rem; }
 .shell__link {
   color: #cbd5e1;
   text-decoration: none;
@@ -60,7 +60,7 @@
 .shell__link:hover { background: rgba(34, 139, 34, 0.1); }
 .shell__link--active { background: rgba(34, 139, 34, 0.25); color: #f0fdf4; }
 
-.shell__user { margin-top: auto; border-top: 1px solid rgba(148,163,184,.25); padding-top: .9rem; flex-shrink: 0; }
+.shell__user { margin-top: 0; border-top: 1px solid rgba(148,163,184,.25); padding-top: .9rem; flex-shrink: 0; background: linear-gradient(180deg, rgba(5,8,5,0) 0%, rgba(5,8,5,0.96) 20%); }
 .shell__user-name { margin: 0; font-weight: 700; }
 .shell__user-email { margin: .2rem 0 .7rem; color: #94a3b8; font-size: .85rem; }
 .shell__logout {
@@ -82,6 +82,7 @@
 
 @media (max-width: 960px) {
   .shell { grid-template-columns: 1fr; }
+  .shell { background: linear-gradient(135deg, #f0f4f0 0%, #e2e8e2 100%); }
   .shell__sidebar {
     position: sticky;
     top: 0;
