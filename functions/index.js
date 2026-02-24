@@ -78,7 +78,7 @@ exports.onUserDeleted = functions.auth.user().onDelete(async (user) => {
 // ---------------------------------------------------------------------------
 
 exports.beforecreated = beforeUserCreated((event) => {
-  const user = event.data;
+  const user = event.data || {};
 
   // Example: restrict registration to a specific email domain.
   // Uncomment and adjust the domain to enable this check.
