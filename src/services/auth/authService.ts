@@ -34,28 +34,7 @@ export interface AuthSession {
   expiresAt: number;
 }
 
-let MOCK_USERS: Record<string, { password: string; user: User }> = {
-  'admin@machagroup.com': {
-    password: 'admin123',
-    user: {
-      id: 'user-001',
-      email: 'admin@machagroup.com',
-      displayName: 'Admin User',
-      roles: ['admin'],
-      assignedBuildings: ['*']
-    }
-  },
-  'user@school.edu': {
-    password: 'user123',
-    user: {
-      id: 'user-002',
-      email: 'user@school.edu',
-      displayName: 'School Administrator',
-      roles: ['user'],
-      assignedBuildings: ['building-001', 'building-002']
-    }
-  }
-};
+let MOCK_USERS: Record<string, { password: string; user: User }> = {};
 
 type AuthStateListener = (user: User | null) => void;
 const listeners: AuthStateListener[] = [];

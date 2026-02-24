@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useRef } from 'react';
+import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { Question } from '../../../types/assessment';
 import { useAssessment, useAssessmentResponse } from '../../../hooks/useAssessment';
 import { QuestionCard } from '../../molecules/QuestionCard';
@@ -32,8 +32,19 @@ const [isSubmitting, setIsSubmitting] = useState(false);
 const [query, setQuery] = useState('');
 const [activeQuery, setActiveQuery] = useState('');
 const [selectedSubsection, setSelectedSubsection] = useState('All');
+const [showTopBtn, setShowTopBtn] = useState(false);
 const chipsRef = useRef<HTMLDivElement | null>(null);
 const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+useEffect(() => {
+  const onScroll = () => setShowTopBtn(window.scrollY > 400);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  return () => window.removeEventListener('scroll', onScroll);
+}, []);
+
+const scrollToTop = useCallback(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}, []);
 
 const handleNext = useCallback(() => {
 if (!assessment) return;
@@ -386,7 +397,7 @@ Save Progress
 </div>
 
 {activeCategory < assessment.categories.length - 1 ? (
-<Button onClick={handleNext}>Next Category</Button>
+<Button onClick={handleNext}>Next Section →</Button>
 ) : (
 <Button onClick={handleSubmit} loading={isSubmitting}>
 Submit Assessment
@@ -394,6 +405,17 @@ Submit Assessment
 )}
 </div>
 </div>
+
+{showTopBtn && (
+<button
+  type="button"
+  className="back-to-top"
+  onClick={scrollToTop}
+  aria-label="Back to top"
+>
+  ↑ Top
+</button>
+)}
 </div>
 );
 };

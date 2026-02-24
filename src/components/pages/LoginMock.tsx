@@ -14,11 +14,9 @@ import { Card } from '../atoms/Card';
 import './LoginMock.css';
 
 /**
- * Mock Login Page
- * Demonstrates authentication flow with new components
- * Credentials:
- * - admin@machagroup.com / admin123 (Admin role)
- * - user@school.edu / user123 (User role)
+ * Login Page
+ * Handles authentication flow with email/password and Google sign-in.
+ * Supports MFA verification when enabled.
  */
 export const LoginMock: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -36,14 +34,17 @@ export const LoginMock: React.FC = () => {
   const [mfaLoading, setMfaLoading] = useState(false);
   const [mfaError, setMfaError] = useState('');
   const recaptchaRef = useRef<HTMLDivElement>(null);
+  const recaptchaInitialized = useRef(false);
 
   const from = (location.state as any)?.from?.pathname || '/home';
 
+  // Initialize recaptcha on mount so it's ready before MFA is triggered
   useEffect(() => {
-    if (mfaStep && recaptchaRef.current) {
+    if (!recaptchaInitialized.current) {
       initRecaptcha('login-recaptcha-container');
+      recaptchaInitialized.current = true;
     }
-  }, [mfaStep]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -265,16 +266,10 @@ export const LoginMock: React.FC = () => {
           </Button>
         </form>
 
-        <div className="login-mock__demo">
-          <h3>Demo Credentials</h3>
-          <div className="login-mock__credentials">
-            <div className="credential">
-              <strong>Admin:</strong> admin@machagroup.com / admin123
-            </div>
-            <div className="credential">
-              <strong>User:</strong> user@school.edu / user123
-            </div>
-          </div>
+        {/* Recaptcha container (invisible) — always in DOM for MFA readiness */}
+        <div id="login-recaptcha-container" ref={recaptchaRef} />
+
+        <div className="login-mock__footer">
           <p className="auth-links" style={{ marginTop: '0.7rem' }}>
             <Link to="/create-account">Create account</Link> · <Link to="/forgot-password">Forgot password</Link>
           </p>
