@@ -2,7 +2,24 @@
 
 A React-based security assessment dashboard for The Macha Group.
 
-## Quick Start
+## Run in the Browser — No Local Setup Required
+
+You can open and run this project entirely in the browser using **GitHub Codespaces**:
+
+1. Click the green **`<> Code`** button at the top of the repository page on GitHub.
+2. Select the **Codespaces** tab.
+3. Click **"Create codespace on main"** (or your branch).
+4. Wait ~1 minute for the environment to build — VS Code opens automatically in your browser.
+5. Fill in your Firebase credentials in the `.env.local` file that was created for you (copy the values from `.env.example`).
+6. In the terminal at the bottom, run:
+   ```bash
+   npm start
+   ```
+7. A pop-up will appear asking you to **Open in Browser** — click it and the app loads.
+
+> **Tip:** Codespaces is free for personal accounts up to 60 hours/month. You can stop or delete a Codespace at any time from the Codespaces tab.
+
+## Local Quick Start
 
 ```bash
 npm install
