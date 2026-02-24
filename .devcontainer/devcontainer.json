@@ -1,0 +1,33 @@
+{
+  "name": "Macha Demo",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+
+  // Install dependencies and copy the env template on first launch
+  "postCreateCommand": "npm install && cp -n .env.example .env.local || true",
+
+  // Forward the React dev server port so you can open it in the browser
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "React Dev Server",
+      "onAutoForward": "openPreview"
+    }
+  },
+
+  // Handy VS Code extensions pre-installed in the Codespace
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "toba.vsfire"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  }
+}
