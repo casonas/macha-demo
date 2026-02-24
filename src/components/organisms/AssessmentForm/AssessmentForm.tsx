@@ -407,13 +407,22 @@ Previous
 </Button>
 
 <div className="assessment-form__actions-center">
-<Button variant="secondary" onClick={handleNextSubsection} disabled={!canGoNextSubsection}>
+<Button
+variant="secondary"
+onClick={handleNextSubsection}
+disabled={!canGoNextSubsection}
+title={canGoNextSubsection ? 'Go to the next subsection' : 'You are at the last subsection'}
+>
 Next Subsection →
 </Button>
 </div>
 
 <div className="assessment-form__actions-right">
-<Button onClick={handleNext} disabled={activeCategory >= assessment.categories.length - 1}>
+<Button
+onClick={handleNext}
+disabled={activeCategory >= assessment.categories.length - 1}
+title={activeCategory >= assessment.categories.length - 1 ? 'You are at the last category' : 'Go to the next category'}
+>
 Next Category →
 </Button>
 <Button onClick={handleSubmit} loading={isSubmitting}>

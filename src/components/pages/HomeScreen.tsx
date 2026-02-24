@@ -43,7 +43,9 @@ export const HomeScreen: React.FC = () => {
   const latestProgress = lastAssessment?.status === 'completed' ? 100 : percentComplete;
   const latestProgressLabel = lastAssessment?.status === 'completed'
     ? 'Submitted'
-    : `${answeredCount} / ${totalQuestions} Questions`;
+    : totalQuestions > 0
+      ? `${answeredCount} / ${totalQuestions} Questions`
+      : `${answeredCount} Questions Answered`;
 
   const quickActions = [
     { label: 'New Inspection', href: '/create-assessment', icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /> },
@@ -150,7 +152,6 @@ export const HomeScreen: React.FC = () => {
                       {lastAssessment.status}
                     </span>
                     
-                     {totalQuestions > 0 && (
                        <div className="mt-10 w-full max-w-lg mx-auto">
                          <div className="flex justify-between text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">
                            <span>{latestProgressLabel}</span>
@@ -166,12 +167,11 @@ export const HomeScreen: React.FC = () => {
                            {lastAssessment.status === 'completed' ? 'Report has been submitted.' : 'Save progress anytime and continue later.'}
                          </p>
                        </div>
-                     )}
                      <button
                        onClick={() => navigate(lastAssessment.status === 'completed' ? `/report/${lastAssessment.id}` : `/assessment?id=${encodeURIComponent(lastAssessment.id)}`)}
                        className="mt-8 px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-sm active:scale-95"
                      >
-                       Open Latest Assessment
+                       {lastAssessment.status === 'completed' ? 'View Report' : 'Continue Assessment'}
                      </button>
                    </div>
                  </div>
