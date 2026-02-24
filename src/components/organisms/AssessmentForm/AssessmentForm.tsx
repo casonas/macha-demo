@@ -168,6 +168,11 @@ acc[name].push(q);
 return acc;
 }, {} as GroupedQuestions);
 const subsectionNames = Object.keys(groupedQuestions);
+const selectedSubsectionIndex = subsectionNames.indexOf(selectedSubsection);
+const canGoNextSubsection = !isSearching && subsectionNames.length > 0 && selectedSubsectionIndex < subsectionNames.length - 1;
+const nextSubsectionLabel = selectedSubsection === 'All'
+? subsectionNames[0]
+: subsectionNames[selectedSubsectionIndex + 1];
 
 const handleSearch = () => {
 setActiveQuery(query);
@@ -177,6 +182,12 @@ const clearSearch = () => {
 setQuery('');
 setActiveQuery('');
 searchInputRef.current?.focus();
+};
+
+const handleNextSubsection = () => {
+if (!canGoNextSubsection || !nextSubsectionLabel) return;
+setSelectedSubsection(nextSubsectionLabel);
+window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 const totalQuestions = assessment.categories.reduce((sum, c) => sum + c.questions.length, 0);
@@ -255,6 +266,11 @@ window.scrollTo({ top: 0, behavior: 'smooth' });
 <p className="assessment-form__description">{assessment.metadata.description}</p>
 
 <div className="assessment-toolbar">
+<div className="assessment-toolbar__save">
+<Button variant="ghost" onClick={handleSave}>
+Save Progress
+</Button>
+</div>
 <label className="toolbar-field">
 <span>Jump to section</span>
 <select
@@ -391,18 +407,19 @@ Previous
 </Button>
 
 <div className="assessment-form__actions-center">
-<Button variant="ghost" onClick={handleSave}>
-Save Progress
+<Button variant="secondary" onClick={handleNextSubsection} disabled={!canGoNextSubsection}>
+Next Subsection →
 </Button>
 </div>
 
-{activeCategory < assessment.categories.length - 1 ? (
-<Button onClick={handleNext}>Next Section →</Button>
-) : (
+<div className="assessment-form__actions-right">
+<Button onClick={handleNext} disabled={activeCategory >= assessment.categories.length - 1}>
+Next Category →
+</Button>
 <Button onClick={handleSubmit} loading={isSubmitting}>
 Submit Assessment
 </Button>
-)}
+</div>
 </div>
 </div>
 

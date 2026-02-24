@@ -40,6 +40,10 @@ export const HomeScreen: React.FC = () => {
   }, [lastAssessment]);
 
   const percentComplete = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+  const latestProgress = lastAssessment?.status === 'completed' ? 100 : percentComplete;
+  const latestProgressLabel = lastAssessment?.status === 'completed'
+    ? 'Submitted'
+    : `${answeredCount} / ${totalQuestions} Questions`;
 
   const quickActions = [
     { label: 'New Inspection', href: '/create-assessment', icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /> },
@@ -121,12 +125,12 @@ export const HomeScreen: React.FC = () => {
 
           {/* 3. BOTTOM CARDS: Forced gap and border-radius */}
           <div 
-            className="grid grid-cols-1 lg:grid-cols-3 items-stretch pb-20"
+            className="grid grid-cols-1 lg:grid-cols-7 items-stretch pb-20"
             style={{ gap: '2rem' }}
           >
             
             <div 
-              className="lg:col-span-2 bg-white border border-slate-200 shadow-sm flex flex-col"
+              className="lg:col-span-5 bg-white border border-slate-200 shadow-sm flex flex-col"
               style={{ minHeight: '450px', padding: '3rem', borderRadius: '1.5rem' }}
             >
               <h3 className="text-xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Latest Assessment</h3>
@@ -146,23 +150,32 @@ export const HomeScreen: React.FC = () => {
                       {lastAssessment.status}
                     </span>
                     
-                    {totalQuestions > 0 && (
-                      <div className="mt-10 w-full max-w-lg mx-auto">
-                        <div className="flex justify-between text-sm font-bold text-slate-500 mb-3 uppercase tracking-wide">
-                          <span>{answeredCount} / {totalQuestions} Questions</span>
-                          <span className="text-emerald-600">{percentComplete}%</span>
-                        </div>
-                        <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-1000 bg-emerald-600"
-                            style={{ width: `${percentComplete}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
+                     {totalQuestions > 0 && (
+                       <div className="mt-10 w-full max-w-lg mx-auto">
+                         <div className="flex justify-between text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">
+                           <span>{latestProgressLabel}</span>
+                           <span className="text-emerald-600">{latestProgress}%</span>
+                         </div>
+                         <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                           <div
+                             className={`h-full rounded-full transition-all duration-1000 ${lastAssessment.status === 'completed' ? 'bg-emerald-600' : 'bg-emerald-500'}`}
+                             style={{ width: `${latestProgress}%` }}
+                           />
+                         </div>
+                         <p className="mt-2 text-xs text-slate-500">
+                           {lastAssessment.status === 'completed' ? 'Report has been submitted.' : 'Save progress anytime and continue later.'}
+                         </p>
+                       </div>
+                     )}
+                     <button
+                       onClick={() => navigate(lastAssessment.status === 'completed' ? `/report/${lastAssessment.id}` : `/assessment?id=${encodeURIComponent(lastAssessment.id)}`)}
+                       className="mt-8 px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-sm active:scale-95"
+                     >
+                       Open Latest Assessment
+                     </button>
+                   </div>
+                 </div>
+               ) : (
                 <div className="flex-grow flex flex-col items-center justify-center text-slate-400">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-6 opacity-30"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/></svg>
                   <p className="font-bold uppercase tracking-widest text-lg">No assessments found.</p>
@@ -171,7 +184,7 @@ export const HomeScreen: React.FC = () => {
             </div>
 
             <div 
-              className="bg-white border border-slate-200 shadow-sm flex flex-col"
+              className="lg:col-span-2 bg-white border border-slate-200 shadow-sm flex flex-col"
               style={{ minHeight: '450px', padding: '3rem', borderRadius: '1.5rem' }} 
             >
               <h3 className="text-xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Quick Actions</h3>

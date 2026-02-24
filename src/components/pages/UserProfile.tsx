@@ -267,12 +267,19 @@ export const UserProfile: React.FC = () => {
                         {a.status === 'completed' ? `Score: ${a.score ?? 0}%` : 'In Progress'}
                       </span>
                       
-                      {a.status === 'completed' && (
+                      {a.status === 'completed' ? (
                         <button
                           onClick={() => navigate(`/report/${a.id}`)}
                           className="px-4 py-1.5 bg-white border border-emerald-200 text-emerald-700 font-bold text-sm rounded-lg hover:bg-emerald-50 transition-colors shadow-sm"
                         >
                           View Report
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => navigate(`/assessment?id=${encodeURIComponent(a.id)}`)}
+                          className="px-4 py-1.5 bg-white border border-amber-200 text-amber-700 font-bold text-sm rounded-lg hover:bg-amber-50 transition-colors shadow-sm"
+                        >
+                          Continue
                         </button>
                       )}
                     </div>
