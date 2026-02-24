@@ -187,8 +187,8 @@ export const HomeScreen: React.FC = () => {
               className="lg:col-span-2 bg-white border border-slate-200 shadow-sm flex flex-col"
               style={{ minHeight: '450px', padding: '3rem', borderRadius: '1.5rem' }} 
             >
-              <h3 className="text-xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Quick Actions</h3>
-              <div className="flex flex-col gap-6 flex-grow justify-center">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-3">Quick Actions</h3>
+              <div className="flex flex-col gap-7 flex-grow justify-start">
                 {quickActions.map((action, i) => (
                   <button
                     key={i}
