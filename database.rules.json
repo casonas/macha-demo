@@ -1,0 +1,45 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",
+        ".validate": "newData.hasChildren(['email', 'displayName'])",
+
+        "email": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "displayName": {
+          ".validate": "newData.isString()"
+        },
+        "roles": {
+          ".write": "root.child('users/' + auth.uid + '/roles/admin').val() === true || root.child('users/' + auth.uid + '/roles/owner').val() === true"
+        }
+      }
+    },
+
+    "assessments": {
+      "$assessmentId": {
+        ".read": "auth !== null && (data.child('userId').val() === auth.uid || root.child('users/' + auth.uid + '/roles/admin').val() === true || root.child('users/' + auth.uid + '/roles/owner').val() === true)",
+        ".write": "auth !== null && ((!data.exists() && newData.child('userId').val() === auth.uid) || data.child('userId').val() === auth.uid)"
+      }
+    },
+
+    "presence": {
+      "$uid": {
+        ".read": "auth !== null",
+        ".write": "$uid === auth.uid"
+      }
+    },
+
+    "notifications": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid || root.child('users/' + auth.uid + '/roles/admin').val() === true"
+      }
+    }
+  }
+}

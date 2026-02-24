@@ -51,7 +51,10 @@ export const LoginMock: React.FC = () => {
     
     try {
       await login(email, password);
-      // If MFA is not enrolled, redirect to MFA setup
+      // Successful login without MFA challenge — user either has no MFA
+      // enrolled or Firebase did not require a second factor.
+      // If MFA is not enrolled, redirect to MFA setup for first-time enrollment.
+      // If MFA is enrolled, go directly to the destination (returning user).
       if (!isMfaEnrolled()) {
         navigate('/mfa-setup', { replace: true });
         return;
@@ -59,13 +62,14 @@ export const LoginMock: React.FC = () => {
       navigate(from, { replace: true });
     } catch (err) {
       if (err instanceof MfaRequiredError) {
+        // Returning user with MFA enrolled — Firebase requires second factor.
+        // Show the MFA verification screen and send the code automatically.
         setMfaResolver(err.resolver);
         setMfaPendingUser(err.pendingUser);
         setMfaError('');
         setMfaCode('');
         setMfaStep(true);
 
-        // Automatically send the verification code
         try {
           setMfaLoading(true);
           const vid = await startMfaSignIn(err.resolver);
@@ -114,7 +118,7 @@ export const LoginMock: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
-      // If MFA is not enrolled, redirect to MFA setup
+      // If MFA is not enrolled, redirect to MFA setup for first-time enrollment.
       if (!isMfaEnrolled()) {
         navigate('/mfa-setup', { replace: true });
         return;
@@ -122,6 +126,7 @@ export const LoginMock: React.FC = () => {
       navigate(from, { replace: true });
     } catch (err) {
       if (err instanceof MfaRequiredError) {
+        // Returning user with MFA enrolled — show verification screen.
         setMfaResolver(err.resolver);
         setMfaPendingUser(err.pendingUser);
         setMfaError('');

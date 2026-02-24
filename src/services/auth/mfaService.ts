@@ -2,6 +2,9 @@
  * SMS Multi-Factor Authentication Service
  * Uses Firebase Phone Auth for SMS-based MFA enrollment and verification.
  * When running in mock mode, simulates the MFA flow for development.
+ *
+ * IMPORTANT: Firebase requires email verification before enrolling second factors.
+ * The startMfaEnrollment function checks this and provides a clear error message.
  */
 
 import {
@@ -42,6 +45,10 @@ export function isMfaEnrolled(): boolean {
 /**
  * Start MFA enrollment: sends verification SMS to the phone number.
  * Returns a verificationId needed to complete enrollment.
+ *
+ * Firebase requires the user's email to be verified before enrolling
+ * second factors. If the email is not verified, this function throws
+ * a descriptive error instead of the raw Firebase auth/unverified-email error.
  */
 export async function startMfaEnrollment(phoneNumber: string): Promise<string> {
   if (!USE_FIREBASE) {
@@ -53,6 +60,15 @@ export async function startMfaEnrollment(phoneNumber: string): Promise<string> {
 
   const user = getFirebaseAuth().currentUser;
   if (!user) throw new Error('No authenticated user');
+
+  // Firebase MFA requires email verification before enrolling second factors.
+  // Check proactively to provide a clear error message.
+  if (!user.emailVerified) {
+    throw new Error(
+      'Please verify your email address before setting up multi-factor authentication. ' +
+      'Check your inbox for a verification link, then try again.'
+    );
+  }
 
   if (!recaptchaVerifier) throw new Error('Recaptcha not initialized. Call initRecaptcha() first.');
 
@@ -93,8 +109,8 @@ export async function startMfaSignIn(resolver: MultiFactorResolver | null): Prom
     return 'mock-signin-verification-id';
   }
 
-  if (!resolver) throw new Error('Resolver is required for Firebase MFA.');
-  if (!recaptchaVerifier) throw new Error('Recaptcha not initialized.');
+  if (!resolver) throw new Error('MFA sign-in resolver is missing. Please sign in again to trigger the MFA challenge.');
+  if (!recaptchaVerifier) throw new Error('Recaptcha not initialized. Call initRecaptcha() first.');
 
   const phoneInfoOptions = {
     multiFactorHint: resolver.hints[0],

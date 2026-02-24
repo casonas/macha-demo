@@ -5,6 +5,15 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
   "hosting": {
     "public": "build",
     "ignore": [
@@ -13,6 +22,10 @@
       "**/node_modules/**"
     ],
     "rewrites": [
+      {
+        "source": "/auth/action",
+        "destination": "/index.html"
+      },
       {
         "source": "**",
         "destination": "/index.html"
