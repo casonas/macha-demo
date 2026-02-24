@@ -412,9 +412,10 @@ export async function refreshSession(): Promise<void> {
 
 /**
  * Session inactivity timeout.
- * Logs the user out after the specified period of inactivity.
+ * Logs the user out after 1 hour of inactivity by default.
+ * After logout, the next sign-in will require MFA verification again.
  */
-const INACTIVITY_TIMEOUT_MS = Number(process.env.REACT_APP_SESSION_TIMEOUT_MS || 30 * 60 * 1000); // 30 min default
+const INACTIVITY_TIMEOUT_MS = Number(process.env.REACT_APP_SESSION_TIMEOUT_MS || 60 * 60 * 1000); // 1 hour default
 let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
 
 function resetInactivityTimer() {
