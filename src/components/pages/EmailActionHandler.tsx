@@ -78,7 +78,9 @@ export const EmailActionHandler: React.FC = () => {
               setMessage(`Your email has been restored to ${restoredEmail}.`);
               // Send a password reset for security
               if (restoredEmail) {
-                sendPasswordResetEmail(auth, restoredEmail).catch(() => {});
+                sendPasswordResetEmail(auth, restoredEmail).catch((err) => {
+                  console.error('Failed to send password reset after email recovery:', err);
+                });
               }
             });
           })

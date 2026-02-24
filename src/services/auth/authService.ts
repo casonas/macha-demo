@@ -89,9 +89,8 @@ async function enrichUserWithRoles(fbUser: FirebaseUser): Promise<User> {
  * These settings direct the user back to the app without relying on Firebase Dynamic Links.
  */
 function getActionCodeSettings(): ActionCodeSettings {
-  const url = process.env.REACT_APP_FIREBASE_AUTH_DOMAIN
-    ? `https://${process.env.REACT_APP_FIREBASE_AUTH_DOMAIN}`
-    : window.location.origin;
+  const authDomain = process.env.REACT_APP_FIREBASE_AUTH_DOMAIN;
+  const url = authDomain ? `https://${authDomain}` : window.location.origin;
   return {
     url,
     handleCodeInApp: false,

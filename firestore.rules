@@ -43,14 +43,14 @@ service cloud.firestore {
         && (resource.data.userId == request.auth.uid || isAdminOrOwner());
     }
 
-    // User profiles: users can read/write their own; admins can read all
+    // User profiles: users can read/write their own; admins can read and update all
     match /users/{userId} {
       allow read: if request.auth != null
         && (request.auth.uid == userId || isAdminOrOwner());
-      allow write: if request.auth != null && request.auth.uid == userId;
-      // Only admins/owners can update roles
+      allow create: if request.auth != null && request.auth.uid == userId;
       allow update: if request.auth != null
         && (request.auth.uid == userId || isAdminOrOwner());
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
     // Photo uploads: only authenticated users can access their own files
