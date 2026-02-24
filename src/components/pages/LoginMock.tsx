@@ -34,17 +34,31 @@ export const LoginMock: React.FC = () => {
   const [mfaLoading, setMfaLoading] = useState(false);
   const [mfaError, setMfaError] = useState('');
   const recaptchaRef = useRef<HTMLDivElement>(null);
-  const recaptchaInitialized = useRef(false);
+  // Tracks whether the SMS code has already been sent for the current MFA session.
+  const mfaSmsSentRef = useRef(false);
 
   const from = (location.state as any)?.from?.pathname || '/home';
 
-  // Initialize recaptcha on mount so it's ready before MFA is triggered
+  // When the MFA view is shown, the login-form DOM is replaced, so the
+  // RecaptchaVerifier must be (re-)initialized against the new element that is
+  // now in the DOM.  We do this in an effect (runs after paint) to guarantee
+  // the new element exists before calling Firebase.
   useEffect(() => {
-    if (!recaptchaInitialized.current) {
+    if (mfaStep && mfaResolver && !mfaSmsSentRef.current) {
+      mfaSmsSentRef.current = true;
       initRecaptcha('login-recaptcha-container');
-      recaptchaInitialized.current = true;
+      setMfaLoading(true);
+      startMfaSignIn(mfaResolver)
+        .then(vid => setMfaVerificationId(vid))
+        .catch(err => setMfaError(err instanceof Error ? err.message : 'Failed to send verification code'))
+        .finally(() => setMfaLoading(false));
     }
-  }, []);
+    // Reset the sent-flag when the user goes back to the login form so that
+    // a subsequent MFA challenge will send a fresh SMS code.
+    if (!mfaStep) {
+      mfaSmsSentRef.current = false;
+    }
+  }, [mfaStep, mfaResolver]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,22 +77,13 @@ export const LoginMock: React.FC = () => {
     } catch (err) {
       if (err instanceof MfaRequiredError) {
         // Returning user with MFA enrolled — Firebase requires second factor.
-        // Show the MFA verification screen and send the code automatically.
+        // Show the MFA verification screen; the useEffect will reinitialize
+        // reCAPTCHA on the newly-rendered element and send the SMS code.
         setMfaResolver(err.resolver);
         setMfaPendingUser(err.pendingUser);
         setMfaError('');
         setMfaCode('');
         setMfaStep(true);
-
-        try {
-          setMfaLoading(true);
-          const vid = await startMfaSignIn(err.resolver);
-          setMfaVerificationId(vid);
-        } catch (sendErr) {
-          setMfaError(sendErr instanceof Error ? sendErr.message : 'Failed to send verification code');
-        } finally {
-          setMfaLoading(false);
-        }
       }
       // Other errors handled by useAuth hook
     }
@@ -127,21 +132,12 @@ export const LoginMock: React.FC = () => {
     } catch (err) {
       if (err instanceof MfaRequiredError) {
         // Returning user with MFA enrolled — show verification screen.
+        // The useEffect will reinitialize reCAPTCHA and send the SMS code.
         setMfaResolver(err.resolver);
         setMfaPendingUser(err.pendingUser);
         setMfaError('');
         setMfaCode('');
         setMfaStep(true);
-
-        try {
-          setMfaLoading(true);
-          const vid = await startMfaSignIn(err.resolver);
-          setMfaVerificationId(vid);
-        } catch (sendErr) {
-          setMfaError(sendErr instanceof Error ? sendErr.message : 'Failed to send verification code');
-        } finally {
-          setMfaLoading(false);
-        }
       }
       // Other errors handled by useAuth hook
     }

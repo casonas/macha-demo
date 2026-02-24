@@ -23,7 +23,9 @@ function mapAuthError(err: unknown): string {
       case 'auth/invalid-credential':
       case 'auth/wrong-password':
       case 'auth/user-not-found':
-        return 'Invalid email or password. Please check your credentials and try again.';
+        return 'Invalid email or password. If you created your account with Google, please use the "Sign in with Google" button. Otherwise, please check your credentials and try again.';
+      case 'auth/account-exists-with-different-credential':
+        return 'This email is already linked to a different sign-in method. Please use the "Sign in with Google" button to access your account.';
       case 'auth/user-disabled':
         return 'This account has been disabled. Please contact support.';
       case 'auth/too-many-requests':

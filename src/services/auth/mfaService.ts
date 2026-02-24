@@ -26,6 +26,12 @@ let recaptchaVerifier: RecaptchaVerifier | null = null;
  */
 export function initRecaptcha(elementId: string): RecaptchaVerifier | null {
   if (!USE_FIREBASE) return null;
+  // Destroy any existing verifier so Firebase doesn't complain about a stale
+  // reference to an element that may have been removed from the DOM.
+  if (recaptchaVerifier) {
+    try { recaptchaVerifier.clear(); } catch (e) { console.warn('RecaptchaVerifier.clear() failed:', e); }
+    recaptchaVerifier = null;
+  }
   recaptchaVerifier = new RecaptchaVerifier(getFirebaseAuth(), elementId, { size: 'invisible' });
   return recaptchaVerifier;
 }
