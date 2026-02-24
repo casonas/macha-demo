@@ -21,7 +21,7 @@ import {
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { getFirebaseAuth, getFirebaseDb } from '../firebaseConfig';
 
-const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
+const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'local') === 'firebase';
 
 export interface User {
   id: string;
