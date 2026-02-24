@@ -8,5 +8,8 @@
  */
 const fs = require('fs');
 const cssFile = './src/index.css';
-const css = fs.readFileSync(cssFile, 'utf8');
-fs.writeFileSync(cssFile, css.replace(/calc\(infinity \* 1px\)/g, '9999px'));
+let css = fs.readFileSync(cssFile, 'utf8');
+css = css.replace(/calc\(infinity \* 1px\)/g, '9999px');
+// Remove vertical-align: middle from rules that set display: block (ignored by browsers, triggers IDE warnings)
+css = css.replace(/(display:\s*block;)\s*vertical-align:\s*middle;/g, '$1');
+fs.writeFileSync(cssFile, css);
