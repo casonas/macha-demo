@@ -13,7 +13,7 @@
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
-const functions = require("firebase-functions");
+const { user } = require("firebase-functions/v1/auth");
 const {
   beforeUserCreated,
   beforeUserSignedIn,
@@ -26,17 +26,17 @@ initializeApp();
 // 1. Auth trigger – user creation
 // ---------------------------------------------------------------------------
 
-exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
+exports.onUserCreated = user().onCreate(async (userRecord) => {
   const db = getFirestore();
-  const userRef = db.collection("users").doc(user.uid);
+  const userRef = db.collection("users").doc(userRecord.uid);
 
   // Persist a user profile if one doesn't already exist.
   const snap = await userRef.get();
   if (!snap.exists) {
     await userRef.set({
-      uid: user.uid,
-      email: user.email || "",
-      displayName: user.displayName || "",
+      uid: userRecord.uid,
+      email: userRecord.email || "",
+      displayName: userRecord.displayName || "",
       roles: ["user"],
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
@@ -46,8 +46,8 @@ exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
   // Write an audit log entry for the new registration.
   await db.collection("auditLogs").add({
     action: "user.created",
-    userId: user.uid,
-    email: user.email || "",
+    userId: userRecord.uid,
+    email: userRecord.email || "",
     timestamp: FieldValue.serverTimestamp(),
   });
 });
@@ -56,17 +56,17 @@ exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
 // 2. Auth trigger – user deletion
 // ---------------------------------------------------------------------------
 
-exports.onUserDeleted = functions.auth.user().onDelete(async (user) => {
+exports.onUserDeleted = user().onDelete(async (userRecord) => {
   const db = getFirestore();
 
   // Remove the user's Firestore profile.
-  await db.collection("users").doc(user.uid).delete();
+  await db.collection("users").doc(userRecord.uid).delete();
 
   // Write an audit log entry for the deletion.
   await db.collection("auditLogs").add({
     action: "user.deleted",
-    userId: user.uid,
-    email: user.email || "",
+    userId: userRecord.uid,
+    email: userRecord.email || "",
     timestamp: FieldValue.serverTimestamp(),
   });
 });
