@@ -15,6 +15,12 @@ export const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID || '',
 };
 
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.error(
+    'Firebase configuration is missing. Copy .env.example to .env.local and fill in your project values.'
+  );
+}
+
 let _app: FirebaseApp | null = null;
 let _auth: Auth | null = null;
 let _db: Firestore | null = null;
