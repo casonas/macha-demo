@@ -15,6 +15,32 @@ import {
 } from '../services/auth/authService';
 import { setCurrentUserId } from '../services/data';
 
+/** Translate Firebase Auth error codes into user-friendly messages. */
+function mapAuthError(err: unknown): string {
+  if (err instanceof Error) {
+    const code = (err as { code?: string }).code;
+    switch (code) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return 'Invalid email or password. Please check your credentials and try again.';
+      case 'auth/user-disabled':
+        return 'This account has been disabled. Please contact support.';
+      case 'auth/too-many-requests':
+        return 'Too many failed login attempts. Please try again later or reset your password.';
+      case 'auth/network-request-failed':
+        return 'Network error. Please check your connection and try again.';
+      case 'auth/popup-closed-by-user':
+        return 'Sign-in was cancelled. Please try again.';
+      case 'auth/cancelled-popup-request':
+        return 'Sign-in request was cancelled. Please try again.';
+      default:
+        return err.message;
+    }
+  }
+  return 'Login failed';
+}
+
 interface UseAuthReturn {
   user: User | null;
   loading: boolean;
@@ -69,7 +95,7 @@ export function useAuth(): UseAuthReturn {
     try { setUser(await authLogin(email, password)); }
     catch (err) {
       if (err instanceof MfaRequiredError) { throw err; }
-      const m = err instanceof Error ? err.message : 'Login failed'; setError(m); throw err;
+      const m = mapAuthError(err); setError(m); throw err;
     }
     finally { setLoading(false); }
   }, []);
@@ -79,7 +105,7 @@ export function useAuth(): UseAuthReturn {
     try { setUser(await authLoginWithGoogle()); }
     catch (err) {
       if (err instanceof MfaRequiredError) { throw err; }
-      const m = err instanceof Error ? err.message : 'Google sign-in failed'; setError(m); throw err;
+      const m = mapAuthError(err); setError(m); throw err;
     }
     finally { setLoading(false); }
   }, []);

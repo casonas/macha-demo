@@ -15,6 +15,8 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
+  getMultiFactorResolver,
+  type MultiFactorError,
   type User as FirebaseUser,
   type ActionCodeSettings
 } from 'firebase/auth';
@@ -175,7 +177,8 @@ export async function login(email: string, password: string): Promise<User> {
       return user;
     } catch (err: any) {
       if (err?.code === 'auth/multi-factor-auth-required') {
-        throw new MfaRequiredError(err.resolver, null);
+        const resolver = getMultiFactorResolver(getFirebaseAuth(), err as MultiFactorError);
+        throw new MfaRequiredError(resolver, null);
       }
       throw err;
     }
@@ -234,7 +237,8 @@ export async function loginWithGoogle(): Promise<User> {
     return user;
   } catch (err: any) {
     if (err?.code === 'auth/multi-factor-auth-required') {
-      throw new MfaRequiredError(err.resolver, null);
+      const resolver = getMultiFactorResolver(getFirebaseAuth(), err as MultiFactorError);
+      throw new MfaRequiredError(resolver, null);
     }
     throw err;
   }
