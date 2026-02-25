@@ -60,7 +60,7 @@ export const HomeScreen: React.FC = () => {
           
           {/* 1. HERO BANNER */}
           <div 
-            className="home-hero relative w-full flex flex-col items-center justify-center shadow-xl overflow-hidden" 
+            className="home-hero relative w-full flex flex-col items-center justify-center shadow-xl overflow-hidden rounded-none" 
             style={{ 
               background: 'radial-gradient(circle at top, #142b14 0%, #050805 100%)',
               paddingTop: '5rem',
@@ -78,13 +78,13 @@ export const HomeScreen: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mt-6 sm:mt-8 w-full sm:w-auto">
                 <button
                   onClick={() => navigate('/create-assessment')}
-                  className="w-full sm:w-auto px-4 sm:px-5 py-2.5 text-sm bg-white text-emerald-900 rounded-lg font-semibold hover:bg-emerald-50 transition-all shadow-lg active:scale-95"
+                  className="w-full sm:w-auto px-5 py-2 text-sm bg-white text-emerald-900 rounded-lg font-semibold hover:bg-emerald-50 transition-all shadow-lg active:scale-95"
                 >
                   + New Assessment
                 </button>
                 <button
                   onClick={() => navigate('/reports')}
-                  className="w-full sm:w-auto px-4 sm:px-5 py-2.5 text-sm border-2 border-emerald-500 text-white rounded-lg font-semibold hover:bg-white/10 transition-all active:scale-95"
+                  className="w-full sm:w-auto px-5 py-2 text-sm border-2 border-emerald-500 text-white rounded-lg font-semibold hover:bg-white/10 transition-all active:scale-95"
                 >
                   View Reports
                 </button>
@@ -93,7 +93,7 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* 2. KPI TABS: Adjusted Margins, forced gap, fixed Total icon */}
-          <div className="home-kpis grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 mt-6 sm:mt-8 mb-8 sm:mb-10 gap-4 sm:gap-6">
+          <div className="home-kpis grid grid-cols-12 mt-6 sm:mt-8 mb-8 sm:mb-10 gap-6">
             {[
               { label: 'Total', val: total, color: 'bg-emerald-100 text-emerald-600', icon: <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></> },
               { label: 'Completed', val: completed, color: 'bg-blue-100 text-blue-600', icon: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></> },
@@ -102,7 +102,7 @@ export const HomeScreen: React.FC = () => {
             ].map((kpi, i) => (
                 <div 
                   key={i} 
-                  className="xl:col-span-3 bg-white border border-slate-200 shadow-sm flex flex-col justify-center items-center sm:items-start text-center sm:text-left transition-all hover:shadow-md"
+                  className="col-span-12 sm:col-span-6 xl:col-span-3 bg-white border border-slate-200 shadow-sm flex flex-col justify-center items-center sm:items-start text-center sm:text-left transition-all hover:shadow-md"
                   style={{ minHeight: '160px', padding: '2rem', borderRadius: '1.5rem' }} 
                 >
                 <div className="flex items-center gap-4 mb-4">
@@ -117,16 +117,25 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* 3. BOTTOM CARDS: Forced gap and border-radius */}
-          <div className="home-bottom grid grid-cols-1 xl:grid-cols-12 items-stretch pb-14 sm:pb-16 gap-4 sm:gap-6">
+          <div className="home-bottom grid grid-cols-12 items-stretch pb-14 sm:pb-16 gap-6">
             
             <div 
-              className="xl:col-span-9 bg-white border border-slate-200 shadow-sm flex flex-col h-full"
+              className="col-span-12 xl:col-span-9 bg-white border border-slate-200 shadow-sm flex flex-col h-full"
               style={{ minHeight: '420px', padding: '3rem', borderRadius: '1.5rem' }}
             >
-              <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Latest Assessment</h3>
+              <div className="mb-4 pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <h3 className="text-xl font-bold text-slate-900">Latest Assessment</h3>
+                {lastAssessment ? (
+                  <span className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
+                    lastAssessment.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}>
+                    {lastAssessment.status}
+                  </span>
+                ) : null}
+              </div>
               
               {lastAssessment ? (
-                <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-3 w-full">
                   <div className="flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-6 w-full">
                     <div className="w-28 h-28 md:w-32 md:h-32 flex-shrink-0 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden">
                       {lastAssessment.score != null ? (
@@ -139,13 +148,8 @@ export const HomeScreen: React.FC = () => {
                       )}
                     </div>
                     <div className="text-center md:text-left w-full min-w-0">
-                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-3">
+                      <div className="mb-3">
                         <h4 className="text-2xl font-bold text-slate-900 break-words" style={{ overflowWrap: 'anywhere' }}>{lastAssessment.name}</h4>
-                        <span className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
-                          lastAssessment.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
-                        }`}>
-                          {lastAssessment.status}
-                        </span>
                       </div>
                       <div className="w-full">
                         <div className="flex justify-between text-xs sm:text-sm font-semibold text-slate-500 mb-2 gap-3">
@@ -164,7 +168,7 @@ export const HomeScreen: React.FC = () => {
                   </div>
                   <button
                     onClick={() => navigate(lastAssessment.status === 'completed' ? `/report/${lastAssessment.id}` : `/assessment?id=${encodeURIComponent(lastAssessment.id)}`)}
-                    className="mt-1 w-full md:w-auto self-stretch md:self-start px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-sm active:scale-95"
+                    className="mt-0 w-full md:w-auto self-stretch md:self-start px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-sm active:scale-95"
                   >
                     {lastAssessment.status === 'completed' ? 'View Report' : 'Continue Assessment'}
                   </button>
@@ -178,7 +182,7 @@ export const HomeScreen: React.FC = () => {
             </div>
 
             <div 
-              className="xl:col-span-3 bg-white border border-slate-200 shadow-sm flex flex-col h-full"
+              className="col-span-12 xl:col-span-3 bg-white border border-slate-200 shadow-sm flex flex-col h-full"
               style={{ minHeight: '450px', padding: '3rem', borderRadius: '1.5rem' }} 
             >
               <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-3">Quick Actions</h3>

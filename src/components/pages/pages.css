@@ -442,7 +442,7 @@ grid-template-columns: 1fr;
 }
 
 .home-screen .home-bottom > div {
-  min-height: 420px !important;
+  min-height: 360px !important;
   border-radius: 1.25rem !important;
   padding: 1.5rem !important;
 }
