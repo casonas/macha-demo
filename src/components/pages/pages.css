@@ -431,7 +431,7 @@ grid-template-columns: 1fr;
 
 /* Home screen only refinements */
 .home-screen .home-hero {
-  border-radius: 0 !important;
+  border-radius: 1.5rem !important;
   padding-top: 3.5rem !important;
   padding-bottom: 3.5rem !important;
 }
