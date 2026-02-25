@@ -428,3 +428,38 @@ grid-template-columns: 1fr;
 .dash-bottom-cards {
   min-height: 600px !important; /* Stretches the bottom cards to fill the page */
 }
+
+/* Home screen only refinements */
+.home-screen .home-hero {
+  border-radius: 1.5rem !important;
+  padding-top: 3.5rem !important;
+  padding-bottom: 3.5rem !important;
+}
+
+.home-screen .home-kpis > div {
+  min-height: 150px;
+  border-radius: 1.25rem !important;
+}
+
+.home-screen .home-bottom > div {
+  min-height: 420px !important;
+  border-radius: 1.25rem !important;
+  padding: 1.5rem !important;
+}
+
+@media (min-width: 640px) {
+  .home-screen .home-hero {
+    padding-top: 4.25rem !important;
+    padding-bottom: 4.25rem !important;
+  }
+
+  .home-screen .home-bottom > div {
+    padding: 2rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home-screen .home-bottom > div {
+    padding: 2.5rem !important;
+  }
+}
