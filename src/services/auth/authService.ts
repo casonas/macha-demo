@@ -469,10 +469,11 @@ export async function refreshSession(): Promise<void> {
 
 /**
  * Session inactivity timeout.
- * Logs the user out after 1 hour of inactivity by default.
+ * Logs the user out after 4 hours of inactivity by default.
  * After logout, the next sign-in will require MFA verification again.
  */
-const INACTIVITY_TIMEOUT_MS = Number(process.env.REACT_APP_SESSION_TIMEOUT_MS || 60 * 60 * 1000); // 1 hour default
+const DEFAULT_INACTIVITY_TIMEOUT_MS = 4 * 60 * 60 * 1000; // 4 hours default
+const INACTIVITY_TIMEOUT_MS = Number(process.env.REACT_APP_SESSION_TIMEOUT_MS || DEFAULT_INACTIVITY_TIMEOUT_MS);
 let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
 
 function resetInactivityTimer() {
@@ -487,6 +488,9 @@ function resetInactivityTimer() {
 }
 
 export function startSessionMonitor() {
+  // For Firebase Auth, rely on Firebase token/session persistence instead of
+  // forcing a client-side inactivity sign-out that can trigger repeated MFA.
+  if (USE_FIREBASE) return;
   const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
   events.forEach(evt => window.addEventListener(evt, resetInactivityTimer, { passive: true }));
   resetInactivityTimer();
