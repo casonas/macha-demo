@@ -13,13 +13,14 @@ import { Input } from '../atoms/Input';
 import { Card } from '../atoms/Card';
 import './LoginMock.css';
 
+const PASSKEY_ENABLED = process.env.REACT_APP_ENABLE_PASSKEY === 'true';
+
 /**
  * Login Page
  * Handles authentication flow with email/password and Google sign-in.
  * Supports MFA verification when enabled.
  */
 export const LoginMock: React.FC = () => {
-  const PASSKEY_ENABLED = process.env.REACT_APP_ENABLE_PASSKEY === 'true';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loginWithGoogle, loading, error } = useAuth();
@@ -67,15 +68,13 @@ export const LoginMock: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
     const checkPasskeySupport = async () => {
-      if (!PASSKEY_ENABLED || typeof window === 'undefined' || !('PublicKeyCredential' in window)) {
+      if (!PASSKEY_ENABLED || typeof PublicKeyCredential === 'undefined') {
         if (!cancelled) setPasskeySupported(false);
         return;
       }
       try {
-        const canUsePlatformAuthenticator = await (
-          window.PublicKeyCredential as typeof PublicKeyCredential
-        ).isUserVerifyingPlatformAuthenticatorAvailable();
-        if (!cancelled) setPasskeySupported(Boolean(canUsePlatformAuthenticator));
+        const canUsePlatformAuthenticator = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        if (!cancelled) setPasskeySupported(canUsePlatformAuthenticator);
       } catch {
         if (!cancelled) setPasskeySupported(false);
       }
@@ -84,7 +83,7 @@ export const LoginMock: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [PASSKEY_ENABLED]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

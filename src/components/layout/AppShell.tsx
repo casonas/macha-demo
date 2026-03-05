@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import './AppShell.css';
@@ -23,9 +23,20 @@ export const AppShell: React.FC<AppShellProps> = ({ title, children, isDashboard
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const mobileOpenRef = useRef(mobileOpen);
 
   useEffect(() => {
-    setMobileOpen(false);
+    mobileOpenRef.current = mobileOpen;
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (mobileOpenRef.current) {
+      setMobileOpen(false);
+      requestAnimationFrame(() => {
+        mainRef.current?.focus();
+      });
+    }
   }, [location.pathname]);
 
   const onLogout = async () => {
@@ -63,7 +74,6 @@ export const AppShell: React.FC<AppShellProps> = ({ title, children, isDashboard
               key={item.to}
               to={item.to}
               className={({ isActive }) => `shell__link ${isActive ? 'shell__link--active' : ''}`}
-              onClick={() => setMobileOpen(false)}
             >
               {item.label}
             </NavLink>
@@ -78,7 +88,11 @@ export const AppShell: React.FC<AppShellProps> = ({ title, children, isDashboard
       </aside>
 
       {/* 2. Added dynamic classes to remove padding when on the Dashboard */}
-      <main className={`shell__main ${isDashboard ? 'shell__main--dashboard' : ''}`}>
+      <main
+        ref={mainRef}
+        className={`shell__main ${isDashboard ? 'shell__main--dashboard' : ''}`}
+        tabIndex={-1}
+      >
         {!isDashboard && (
           <header className="shell__header">
             <h2>{title}</h2>
