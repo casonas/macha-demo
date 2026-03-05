@@ -86,3 +86,65 @@ Recommended direction:
 3. Keep SMS MFA as fallback for users/devices that do not support passkeys.
 
 Firebase Auth email/password + SMS MFA does not automatically expose browser Face ID as a drop-in second factor. Face ID support on web generally requires a passkey/WebAuthn implementation path.
+
+### Easy step-by-step rollout (optional, supported devices only)
+
+This keeps current config stable and does **not** force biometric auth on desktop users.
+
+1. **Keep current login as default**  
+   Do not remove email/password or SMS MFA. Passkeys should be an optional extra button.
+
+2. **Show passkey UI only when supported**  
+   In browser code, gate passkey buttons with capability checks:
+   - `window.PublicKeyCredential` exists
+   - (optional stronger check) `PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()`
+
+3. **Never block sign-in if passkey is unavailable**  
+   If unsupported (or user cancels), continue normal login flow.  
+   This ensures desktop users on unsupported browsers are never forced into Face ID.
+
+4. **Add enrollment in profile/settings first**  
+   Start with "Add passkey" in authenticated settings, then later add "Sign in with passkey" on login.
+
+5. **Use a backend endpoint for WebAuthn challenge verify**  
+   WebAuthn requires server-side challenge generation/verification for production security.
+   Keep this endpoint optional until enabled.
+
+6. **Roll out behind a client feature flag**  
+   Example: `REACT_APP_ENABLE_PASSKEY=false` by default, then enable gradually.
+
+7. **Fallback remains unchanged**  
+   Email/password + existing MFA remains primary until passkeys are fully validated.
+
+### Apple Sign-In note
+
+Apple Sign-In is separate from passkeys and requires additional setup.
+
+- **Yes, you can add it as optional** (recommended).  
+- **No, it should not be required for desktop users.**
+
+High-level Apple Sign-In steps:
+
+1. In Apple Developer, create/configure a **Services ID** and set allowed return URLs.
+2. In Firebase Console → Authentication → Sign-in method, enable **Apple**.
+3. Add Apple provider handling in the client login page (show button only when enabled).
+4. Keep existing login methods as fallback.
+5. Test on supported Apple devices/browsers and verify non-Apple desktop flow is unchanged.
+
+### Which providers do you actually need?
+
+Given your current setup (Email/Password, Phone, Google, Apple enabled + SMS MFA):
+
+- You already have everything needed for your **current** auth flows.
+- For **Face ID / biometrics via passkeys**, there is **no additional Firebase sign-in provider** to enable.
+- Passkeys/WebAuthn are implemented as an app flow (client + backend challenge verification), not a Firebase provider toggle.
+
+Recommended minimal provider strategy:
+
+1. Keep **Email/Password** (primary fallback).
+2. Keep **Phone + SMS MFA** (existing second factor).
+3. Keep **Google** (optional social sign-in).
+4. Keep **Apple** only if you want Apple users to have one-click federated login.
+5. Do **not** add extra providers (Facebook/GitHub/Microsoft/etc.) unless your users explicitly need them.
+
+This keeps configuration simple and reduces maintenance risk while preserving optional sign-in choices.
