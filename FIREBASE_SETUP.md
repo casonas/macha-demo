@@ -64,7 +64,7 @@ To skip SMS MFA prompts on the same browser/device for 24 hours after a successf
 3. Set **Trusted device duration** to **24 hours**
 4. Click **Save**
 
-After this is enabled, Firebase manages the trusted-device token automatically. No extra backend code is required for this behavior.
+After this is enabled, Firebase mode manages the trusted-device token automatically. No additional server-side code is required for this Firebase behavior.
 
 ### reCAPTCHA Configuration
 Firebase uses reCAPTCHA to prevent abuse of SMS. The app uses invisible reCAPTCHA.
