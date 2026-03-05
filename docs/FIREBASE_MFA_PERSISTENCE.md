@@ -6,6 +6,7 @@ If persistence is session-only, users can be challenged for MFA again after relo
 ## Required setting
 
 Set Firebase Auth persistence to **local** before any sign-in flow runs.
+In this repo, it is initialized both at app startup and before sign-in methods, so it applies automatically for any account without server-side setup.
 
 ### Modular SDK (v9+)
 
