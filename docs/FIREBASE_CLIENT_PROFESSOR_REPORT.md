@@ -60,19 +60,23 @@ Firebase was selected for four main reasons:
 - Handles sign-in/sign-up flows and session management.
 - Supports password reset and can support multi-factor authentication (MFA).
 - Reduces risk by avoiding custom authentication logic.
+- Enables role-aware data access by linking authenticated users to Firestore profile records.
 
 ### 4.2 Cloud Firestore (Database)
 - Stores user and assessment data in cloud collections/documents.
 - Supports real-time and structured querying.
 - Works with security rules so users can only access their authorized data.
+- Powers assessment template loading and dynamic data retrieval by assessment ID.
 
 ### 4.3 Firebase Storage
 - Stores uploaded files (such as site photos/documents).
 - Integrates with secure access patterns based on authentication and path-based rules.
+- Supports evidence capture workflows where media is attached to assessments.
 
 ### 4.4 Firebase Hosting
 - Publishes the frontend securely using HTTPS.
 - Supports fast global content delivery and simple deployment workflow.
+- Simplifies release flow for client demos and production rollouts.
 
 ### 4.5 Cloud Functions (Roadmap/Expansion)
 - Used for backend logic that should not run in the browser.
@@ -80,7 +84,94 @@ Firebase was selected for four main reasons:
 
 ---
 
-## 5) Security Posture and Risk Management
+## 5) Functionality Examples (Business + Technical)
+
+### Example A — User Login and Session Establishment
+**Business value:** Securely confirms user identity before granting access to assessments.
+
+**Current behavior in this codebase (Firebase mode):**
+1. User submits email/password in the React app.
+2. `authService.login(...)` calls Firebase Auth sign-in.
+3. App receives authenticated user identity and loads role/profile context.
+4. UI updates to authorized workspace.
+
+```typescript
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { getFirebaseAuth } from '../firebaseConfig';
+
+const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+const uid = cred.user.uid;
+```
+
+### Example B — Load Assessment Template from Firestore
+**Business value:** Administrators can manage assessment structures centrally without redeploying the app.
+
+**Current behavior in this codebase:**
+1. Frontend requests active nodes for a selected assessment.
+2. Firestore query returns categories, subcategories, and questions.
+3. Client maps these nodes into the assessment format used by the UI.
+
+```typescript
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { getFirebaseDb } from '../firebaseConfig';
+
+const snap = await getDocs(
+  query(
+    collection(getFirebaseDb(), 'assessmentNodes'),
+    where('assessmentId', '==', assessmentId),
+    where('active', '==', true)
+  )
+);
+```
+
+### Example C — Upload Assessment Evidence to Storage (Planned/Expanding)
+**Business value:** Enables photo/document evidence attachment for auditability and traceability.
+
+**Planned technical flow:**
+1. User selects a file from the assessment UI.
+2. Client uploads file to a user/assessment-scoped Storage path.
+3. Metadata or download URL is written to Firestore for report generation.
+
+```typescript
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getFirebaseStorage } from '../firebaseConfig';
+
+const fileRef = ref(getFirebaseStorage(), `assessments/${assessmentId}/${file.name}`);
+await uploadBytes(fileRef, file);
+const url = await getDownloadURL(fileRef);
+```
+
+### Example D — Cloud Function for Trusted Scoring (Roadmap)
+**Business value:** Keeps sensitive scoring/decision logic out of the browser and enforces consistent rules.
+
+**Planned technical flow:**
+1. Client sends assessment responses to callable function.
+2. Function validates auth and data integrity.
+3. Function computes score and returns normalized result.
+
+```typescript
+import { getFunctions, httpsCallable } from 'firebase/functions';
+
+const calculateScore = httpsCallable(getFunctions(), 'calculateScore');
+const result = await calculateScore({ assessmentId, responses });
+```
+
+---
+
+## 6) Implementation Detail Snapshot (Current State)
+
+The repository already contains concrete Firebase integration points:
+
+- **Configuration layer:** `src/services/firebaseConfig.ts` centralizes app/auth/db/storage initialization.
+- **Authentication service:** `src/services/auth/authService.ts` integrates Firebase Auth flows (email/password, Google, password reset, email verification, MFA handling).
+- **Data service:** `src/services/data/AssessmentLoader.ts` retrieves assessment records from Firestore and maps them into application models.
+- **Deployment support:** Firebase Hosting and project-level setup are documented in `FIREBASE_SETUP.md`.
+
+These implementation details confirm Firebase is not only conceptual; it is actively wired into runtime code paths for authentication and assessment data.
+
+---
+
+## 7) Security Posture and Risk Management
 
 Firebase improves security when configured correctly.  
 This project’s security direction includes:
@@ -103,7 +194,7 @@ This project’s security direction includes:
 
 ---
 
-## 6) Operational and Business Value
+## 8) Operational and Business Value
 
 From a **client perspective**, Firebase provides:
 
@@ -121,7 +212,7 @@ From an **academic/professor perspective**, Firebase demonstrates:
 
 ---
 
-## 7) Cost and Scalability Considerations
+## 9) Cost and Scalability Considerations
 
 Firebase supports staged growth:
 
@@ -136,7 +227,7 @@ Cost should be managed through:
 
 ---
 
-## 8) Current Maturity and Next Steps
+## 10) Current Maturity and Next Steps
 
 Based on the existing project documentation, Firebase adoption is in active implementation with a clear roadmap.  
 Recommended next steps:
@@ -149,7 +240,7 @@ Recommended next steps:
 
 ---
 
-## 9) Conclusion
+## 11) Conclusion
 
 Firebase is an appropriate and strategic platform choice for this project.  
 It provides a professional-grade cloud backend that is:
