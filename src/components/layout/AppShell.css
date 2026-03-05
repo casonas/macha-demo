@@ -108,7 +108,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 280px;
+  width: min(280px, 86vw);
   padding: 1.25rem;
   transform: translateX(0);
   z-index: 50;

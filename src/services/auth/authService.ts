@@ -21,7 +21,11 @@ import {
   type ActionCodeSettings
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { getFirebaseAuth, getFirebaseDb } from '../firebaseConfig';
+import {
+  ensureFirebaseAuthPersistence,
+  getFirebaseAuth,
+  getFirebaseDb,
+} from '../firebaseConfig';
 
 const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
 
@@ -211,6 +215,7 @@ export class MfaRequiredError extends Error {
 
 export async function login(email: string, password: string): Promise<User> {
   if (USE_FIREBASE) {
+    await ensureFirebaseAuthPersistence();
     try {
       const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
       const user = await enrichUserWithRoles(cred.user);
@@ -273,6 +278,7 @@ export async function loginWithGoogle(): Promise<User> {
   if (!USE_FIREBASE) {
     throw new Error('Google Sign-In is only available with Firebase.');
   }
+  await ensureFirebaseAuthPersistence();
   try {
     const provider = new GoogleAuthProvider();
     const cred = await signInWithPopup(getFirebaseAuth(), provider);
@@ -291,6 +297,7 @@ export async function loginWithGoogle(): Promise<User> {
 
 export async function register(input: { displayName: string; email: string; password: string; phone?: string; organization?: string; address?: string }): Promise<User> {
   if (USE_FIREBASE) {
+    await ensureFirebaseAuthPersistence();
     const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), input.email, input.password);
     await updateProfile(cred.user, { displayName: input.displayName });
     await saveUserProfileToFirestore(cred.user, { phone: input.phone, organization: input.organization, address: input.address });
@@ -443,6 +450,7 @@ export async function signInWithCustomToken(customToken: string): Promise<User> 
   if (!USE_FIREBASE) {
     throw new Error('Custom token sign-in is only available with Firebase.');
   }
+  await ensureFirebaseAuthPersistence();
   const cred = await firebaseSignInWithCustomToken(getFirebaseAuth(), customToken);
   await saveUserProfileToFirestore(cred.user);
   const user = await enrichUserWithRoles(cred.user);
@@ -461,10 +469,11 @@ export async function refreshSession(): Promise<void> {
 
 /**
  * Session inactivity timeout.
- * Logs the user out after 1 hour of inactivity by default.
+ * Logs the user out after 4 hours of inactivity by default.
  * After logout, the next sign-in will require MFA verification again.
  */
-const INACTIVITY_TIMEOUT_MS = Number(process.env.REACT_APP_SESSION_TIMEOUT_MS || 60 * 60 * 1000); // 1 hour default
+const DEFAULT_INACTIVITY_TIMEOUT_MS = 4 * 60 * 60 * 1000; // 4 hours default
+const INACTIVITY_TIMEOUT_MS = Number(process.env.REACT_APP_SESSION_TIMEOUT_MS || DEFAULT_INACTIVITY_TIMEOUT_MS);
 let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
 
 function resetInactivityTimer() {
@@ -479,6 +488,9 @@ function resetInactivityTimer() {
 }
 
 export function startSessionMonitor() {
+  // For Firebase Auth, rely on Firebase token/session persistence instead of
+  // forcing a client-side inactivity sign-out that can trigger repeated MFA.
+  if (USE_FIREBASE) return;
   const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
   events.forEach(evt => window.addEventListener(evt, resetInactivityTimer, { passive: true }));
   resetInactivityTimer();

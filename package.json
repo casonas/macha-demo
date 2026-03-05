@@ -19,6 +19,7 @@
     "watch:css": "npx tailwindcss -i ./src/App.css -o ./src/index.css --watch",
     "build": "npm run build:css && react-scripts build",
     "test": "react-scripts test",
+    "test:e2e:auth-persistence": "node scripts/e2e/auth-persistence.e2e.cjs",
     "eject": "react-scripts eject",
     "postinstall": "cd functions && npm install"
   },
@@ -43,6 +44,7 @@
     "@tailwindcss/cli": "^4.2.0",
     "autoprefixer": "^10.4.24",
     "postcss": "^8.5.6",
+    "puppeteer": "^24.38.0",
     "tailwindcss": "^4.2.0"
   },
   "description": "",

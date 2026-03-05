@@ -13,6 +13,8 @@ import { Input } from '../atoms/Input';
 import { Card } from '../atoms/Card';
 import './LoginMock.css';
 
+const PASSKEY_ENABLED = process.env.REACT_APP_ENABLE_PASSKEY === 'true';
+
 /**
  * Login Page
  * Handles authentication flow with email/password and Google sign-in.
@@ -24,6 +26,9 @@ export const LoginMock: React.FC = () => {
   const { login, loginWithGoogle, loading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [passkeySupported, setPasskeySupported] = useState(false);
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const [passkeyMessage, setPasskeyMessage] = useState('');
 
   // MFA state
   const [mfaStep, setMfaStep] = useState(false);
@@ -59,6 +64,26 @@ export const LoginMock: React.FC = () => {
       mfaSmsSentRef.current = false;
     }
   }, [mfaStep, mfaResolver]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const checkPasskeySupport = async () => {
+      if (!PASSKEY_ENABLED || typeof PublicKeyCredential === 'undefined') {
+        if (!cancelled) setPasskeySupported(false);
+        return;
+      }
+      try {
+        const canUsePlatformAuthenticator = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        if (!cancelled) setPasskeySupported(canUsePlatformAuthenticator);
+      } catch {
+        if (!cancelled) setPasskeySupported(false);
+      }
+    };
+    void checkPasskeySupport();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,6 +165,26 @@ export const LoginMock: React.FC = () => {
         setMfaStep(true);
       }
       // Other errors handled by useAuth hook
+    }
+  };
+
+  const handlePasskeySignIn = async () => {
+    setPasskeyMessage('');
+    setPasskeyLoading(true);
+    try {
+      const configuredEndpoint = process.env.REACT_APP_PASSKEY_LOGIN_ENDPOINT;
+      if (!configuredEndpoint) {
+        setPasskeyMessage(
+          'Passkey is supported on this device, but server verification is not configured yet. Continue with your normal sign-in method.'
+        );
+        return;
+      }
+      // Scaffold only: endpoint wiring is intentionally optional and backend-dependent.
+      setPasskeyMessage(
+        'Passkey endpoint detected. Complete WebAuthn challenge wiring on the backend to finish passkey login.'
+      );
+    } finally {
+      setPasskeyLoading(false);
     }
   };
 
@@ -265,6 +310,22 @@ export const LoginMock: React.FC = () => {
               Sign in with Google
             </span>
           </Button>
+
+          {PASSKEY_ENABLED && passkeySupported && (
+            <Button
+              type="button"
+              fullWidth
+              size="lg"
+              variant="secondary"
+              onClick={handlePasskeySignIn}
+              loading={passkeyLoading}
+              disabled={loading || passkeyLoading}
+            >
+              Sign in with Passkey (Optional)
+            </Button>
+          )}
+
+          {passkeyMessage && <p className="login-mock__hint">{passkeyMessage}</p>}
         </form>
 
         {/* Recaptcha container (invisible) — always in DOM for MFA readiness */}
