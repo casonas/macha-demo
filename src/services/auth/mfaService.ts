@@ -17,8 +17,24 @@ import {
 import { getFirebaseAuth } from '../firebaseConfig';
 
 const USE_FIREBASE = (process.env.REACT_APP_DATA_PROVIDER || 'firebase') === 'firebase';
+const LEGACY_MFA_ENROLLED_KEY = 'macha.mfaEnrolled';
 
 let recaptchaVerifier: RecaptchaVerifier | null = null;
+
+function getMockCurrentUserId(): string | null {
+  try {
+    const sessionJson = localStorage.getItem('mockAuthSession');
+    if (!sessionJson) return null;
+    const session = JSON.parse(sessionJson) as { user?: { id?: string } };
+    return session.user?.id || null;
+  } catch {
+    return null;
+  }
+}
+
+function getMfaEnrollmentKey(userId: string): string {
+  return `macha.mfaEnrolled.${userId}`;
+}
 
 /**
  * Initialize a RecaptchaVerifier on a given DOM element.
@@ -41,7 +57,9 @@ export function initRecaptcha(elementId: string): RecaptchaVerifier | null {
  */
 export function isMfaEnrolled(): boolean {
   if (!USE_FIREBASE) {
-    return localStorage.getItem('macha.mfaEnrolled') === 'true';
+    const userId = getMockCurrentUserId();
+    if (userId && localStorage.getItem(getMfaEnrollmentKey(userId)) === 'true') return true;
+    return localStorage.getItem(LEGACY_MFA_ENROLLED_KEY) === 'true';
   }
   const user = getFirebaseAuth().currentUser;
   if (!user) return false;
@@ -91,7 +109,13 @@ export async function completeMfaEnrollment(verificationId: string, smsCode: str
   if (!USE_FIREBASE) {
     await new Promise(r => setTimeout(r, 500));
     if (!/^\d{6}$/.test(smsCode)) throw new Error('Invalid verification code. Please enter a 6-digit code.');
-    localStorage.setItem('macha.mfaEnrolled', 'true');
+    const userId = getMockCurrentUserId();
+    if (userId) {
+      localStorage.setItem(getMfaEnrollmentKey(userId), 'true');
+      localStorage.removeItem(LEGACY_MFA_ENROLLED_KEY);
+    } else {
+      localStorage.setItem(LEGACY_MFA_ENROLLED_KEY, 'true');
+    }
     localStorage.removeItem('macha.mfaPending');
     return;
   }
@@ -151,7 +175,11 @@ export async function completeMfaSignIn(
  */
 export async function unenrollMfa(): Promise<void> {
   if (!USE_FIREBASE) {
-    localStorage.removeItem('macha.mfaEnrolled');
+    const userId = getMockCurrentUserId();
+    if (userId) {
+      localStorage.removeItem(getMfaEnrollmentKey(userId));
+    }
+    localStorage.removeItem(LEGACY_MFA_ENROLLED_KEY);
     return;
   }
 

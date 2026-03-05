@@ -63,19 +63,7 @@ export function useAuth(): UseAuthReturn {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-        if (currentUser) {
-          setCurrentUserId(currentUser.id);
-          startSessionMonitor();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
+    let authStateReceived = false;
     const unsubscribe = subscribeToAuthState((u) => {
       setUser(u);
       if (u) {
@@ -84,6 +72,10 @@ export function useAuth(): UseAuthReturn {
       } else {
         setCurrentUserId('');
         stopSessionMonitor();
+      }
+      if (!authStateReceived) {
+        authStateReceived = true;
+        setLoading(false);
       }
     });
     return () => {
