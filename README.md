@@ -122,9 +122,12 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-await setPersistence(auth, browserLocalPersistence);
 export const db = getFirestore(app);
+
+export const auth = getAuth(app);
+export async function initFirebaseAuthPersistence() {
+  await setPersistence(auth, browserLocalPersistence);
+}
 ```
 
 For MFA trusted-device behavior details and troubleshooting, see `/docs/FIREBASE_MFA_PERSISTENCE.md`.

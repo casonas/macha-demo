@@ -1,8 +1,9 @@
 const { spawn } = require('child_process');
+const os = require('os');
 const path = require('path');
 const puppeteer = require('puppeteer');
 
-const ROOT = '/home/runner/work/macha-demo/macha-demo';
+const ROOT = path.resolve(__dirname, '../..');
 const BASE_URL = process.env.E2E_BASE_URL || 'http://127.0.0.1:4173';
 const TEST_EMAIL = process.env.E2E_TEST_EMAIL || 'mfa-e2e-placeholder@example.com';
 const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || 'Password1';
@@ -53,7 +54,9 @@ async function waitForPath(page, pathname, timeout = 30000) {
 
 async function existsByText(page, text) {
   return page.evaluate((targetText) =>
-    Array.from(document.querySelectorAll('*')).some((el) => (el.textContent || '').trim() === targetText),
+    Array.from(document.querySelectorAll('button, a, h1, h2, h3, p, span')).some(
+      (el) => (el.textContent || '').trim() === targetText
+    ),
   text);
 }
 
@@ -76,7 +79,7 @@ async function run() {
 
   const browser = await puppeteer.launch({
     headless: true,
-    userDataDir: path.join('/tmp', 'macha-e2e-auth-profile'),
+    userDataDir: path.join(os.tmpdir(), 'macha-e2e-auth-profile'),
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
@@ -127,7 +130,7 @@ async function run() {
         (el.textContent || '').includes('Verification Required')
       )
     );
-    if (hasMfaPrompt > 0) {
+    if (hasMfaPrompt) {
       throw new Error('Expected authenticated session after reload, but MFA prompt was shown again.');
     }
 
