@@ -109,7 +109,7 @@ Create a file `src/services/firebase.ts` (or update the existing one):
 
 ```ts
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -123,8 +123,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+await setPersistence(auth, browserLocalPersistence);
 export const db = getFirestore(app);
 ```
+
+For MFA trusted-device behavior details and troubleshooting, see `/docs/FIREBASE_MFA_PERSISTENCE.md`.
 
 Add your keys to a `.env` file at the project root (never commit this file). Create React App automatically exposes variables prefixed with `REACT_APP_`:
 

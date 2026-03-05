@@ -1,5 +1,10 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
+import {
+  browserLocalPersistence,
+  getAuth,
+  setPersistence,
+  type Auth,
+} from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
@@ -29,6 +34,7 @@ if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
 
 let _app: FirebaseApp | null = null;
 let _auth: Auth | null = null;
+let _authPersistence: Promise<Auth> | null = null;
 let _db: Firestore | null = null;
 let _storage: FirebaseStorage | null = null;
 
@@ -44,6 +50,23 @@ export function getFirebaseAuth(): Auth {
     _auth = getAuth(getApp());
   }
   return _auth;
+}
+
+/**
+ * Ensure Auth persistence is local so Firebase can remember the trusted
+ * session/device across reloads and browser restarts.
+ */
+export function ensureFirebaseAuthPersistence(): Promise<Auth> {
+  const auth = getFirebaseAuth();
+  if (!_authPersistence) {
+    _authPersistence = setPersistence(auth, browserLocalPersistence)
+      .then(() => auth)
+      .catch((err) => {
+        _authPersistence = null;
+        throw err;
+      });
+  }
+  return _authPersistence;
 }
 
 export function getFirebaseDb(): Firestore {
