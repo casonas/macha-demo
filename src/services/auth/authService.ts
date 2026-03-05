@@ -47,6 +47,8 @@ const listeners: AuthStateListener[] = [];
 const loginAttempts = new Map<string, { count: number; lockedUntil?: number }>();
 const MAX_ATTEMPTS = Number(process.env.REACT_APP_MAX_LOGIN_ATTEMPTS || 5);
 const LOCK_WINDOW_MS = 10 * 60 * 1000;
+const MFA_TRUST_KEY = 'macha.mfaTrustedDevice';
+const MFA_TRUST_DURATION_MS = 24 * 60 * 60 * 1000;
 
 function notifyListeners(user: User | null) {
   listeners.forEach(listener => listener(user));
@@ -132,6 +134,32 @@ function setSession(user: User) {
   localStorage.setItem('mockAuthSession', JSON.stringify(session));
 }
 
+function rememberTrustedMfaDevice(userId: string): void {
+  const record = {
+    userId,
+    expiresAt: Date.now() + MFA_TRUST_DURATION_MS
+  };
+  localStorage.setItem(MFA_TRUST_KEY, JSON.stringify(record));
+}
+
+function hasValidTrustedMfaDevice(userId: string): boolean {
+  try {
+    const raw = localStorage.getItem(MFA_TRUST_KEY);
+    if (!raw) return false;
+    const record = JSON.parse(raw) as { userId?: string; expiresAt?: number };
+    if (record.userId !== userId) return false;
+    if (typeof record.expiresAt !== 'number') return false;
+    if (Date.now() >= record.expiresAt) {
+      localStorage.removeItem(MFA_TRUST_KEY);
+      return false;
+    }
+    return true;
+  } catch {
+    localStorage.removeItem(MFA_TRUST_KEY);
+    return false;
+  }
+}
+
 export function subscribeToAuthState(listener: AuthStateListener): () => void {
   listeners.push(listener);
 
@@ -207,7 +235,7 @@ export async function login(email: string, password: string): Promise<User> {
   loginAttempts.delete(key);
 
   // Check if MFA is enrolled in mock mode
-  if (localStorage.getItem('macha.mfaEnrolled') === 'true') {
+  if (localStorage.getItem('macha.mfaEnrolled') === 'true' && !hasValidTrustedMfaDevice(record.user.id)) {
     throw new MfaRequiredError(null, record.user);
   }
 
@@ -220,6 +248,7 @@ export async function login(email: string, password: string): Promise<User> {
  * Complete login for a user who passed MFA verification (mock mode).
  */
 export function completeMfaLogin(user: User): void {
+  rememberTrustedMfaDevice(user.id);
   setSession(user);
   notifyListeners(user);
 }

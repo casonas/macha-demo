@@ -56,6 +56,16 @@ MFA is **mandatory** for all users. Follow these steps to enable it:
 - During login, users with MFA enrolled will be prompted for an SMS code
 - The app automatically redirects users to `/mfa-setup` if MFA is not enrolled
 
+### Configure 24-Hour MFA Device Remembering (Required to Avoid Repeated MFA Prompts)
+To skip SMS MFA prompts on the same browser/device for 24 hours after a successful MFA sign-in, you must enable trusted devices in Firebase:
+
+1. Go to **Build → Authentication → Settings**
+2. Scroll to **Multi-factor authentication**
+3. Set **Trusted device duration** to **24 hours**
+4. Click **Save**
+
+After this is enabled, Firebase manages the trusted-device token automatically. No extra backend code is required for this behavior.
+
 ### reCAPTCHA Configuration
 Firebase uses reCAPTCHA to prevent abuse of SMS. The app uses invisible reCAPTCHA.
 - No additional configuration needed — reCAPTCHA is handled automatically by Firebase
@@ -292,6 +302,13 @@ firebase deploy
 2. If MFA is enrolled, you will receive an SMS code
 3. Enter the code to complete sign-in
 4. If MFA is not enrolled, you will be redirected to `/mfa-setup`
+
+### ✅ Verify 24-Hour Trusted Device Behavior
+1. Complete a normal MFA login once (email/password + SMS code)
+2. Sign out
+3. Sign in again from the same browser/device within 24 hours
+4. Confirm you are not asked for another SMS code
+5. Test from a different browser or after 24 hours to confirm MFA is required again
 
 ### ✅ Google Sign-In + MFA
 1. Click **Sign in with Google** on the login page
