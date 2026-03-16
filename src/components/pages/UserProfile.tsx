@@ -10,6 +10,8 @@ import {
   revokeTrustedDevice,
   listWebauthnCredentials,
   revokeWebauthnCredential,
+  type TrustedDeviceRecord,
+  type WebAuthnCredentialRecord,
 } from '../../services/auth/securitySessionService';
 import './pages.css';
 
@@ -29,8 +31,8 @@ export const UserProfile: React.FC = () => {
   });
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
-  const [trustedDevices, setTrustedDevices] = useState<Array<any>>([]);
-  const [webauthnCredentials, setWebauthnCredentials] = useState<Array<any>>([]);
+  const [trustedDevices, setTrustedDevices] = useState<TrustedDeviceRecord[]>([]);
+  const [webauthnCredentials, setWebauthnCredentials] = useState<WebAuthnCredentialRecord[]>([]);
   const [securityLoading, setSecurityLoading] = useState(false);
   const [securityError, setSecurityError] = useState('');
   const [securitySuccess, setSecuritySuccess] = useState('');
@@ -311,7 +313,7 @@ export const UserProfile: React.FC = () => {
           >
             <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-              Device &amp; Face ID Security
+              Device & Face ID Security
             </h3>
 
             {securityError && <p className="text-red-600 text-sm mb-3">{securityError}</p>}

@@ -11,6 +11,7 @@ const {
 
 const SESSION_EXPIRES_MS = 24 * 60 * 60 * 1000;
 const TRUST_DEVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
+const WEBAUTHN_TIMEOUT_MS = 60_000;
 
 function hashIdentifier(value) {
   return crypto.createHash('sha256').update(String(value || ''), 'utf8').digest('hex');
@@ -325,7 +326,8 @@ async function handleSessionLogin(req, res) {
   }
 
   if (risk.reasons.includes('impossible_travel')) {
-    // Security choice: impossible-travel patterns revoke remembered devices.
+    // Security choice: impossible-travel events imply likely session theft or
+    // credential replay, so we revoke remembered devices proactively.
     await revokeAllTrustedDevices(db, uid);
   }
 
@@ -375,14 +377,15 @@ async function handleWebauthnRegisterOptions(req, res) {
     userID: uid,
     userName: userRecord.email || uid,
     userDisplayName: userRecord.displayName || userRecord.email || uid,
-    timeout: 60_000,
+    timeout: WEBAUTHN_TIMEOUT_MS,
     attestationType: 'none',
     authenticatorSelection: {
       authenticatorAttachment: 'platform',
       residentKey: 'discouraged',
       userVerification: 'preferred',
     },
-    // Security choice: avoid discoverable credentials requirement for broad compatibility.
+    // Security choice: requireResidentKey=false avoids requiring discoverable credentials,
+    // keeping platform-authenticator enrollment broadly compatible.
     requireResidentKey: false,
   });
 
@@ -455,7 +458,7 @@ async function handleWebauthnAuthOptions(req, res) {
   const options = await generateAuthenticationOptions({
     rpID,
     userVerification: 'preferred',
-    timeout: 60_000,
+    timeout: WEBAUTHN_TIMEOUT_MS,
   });
 
   const challengeId = randomUUID();

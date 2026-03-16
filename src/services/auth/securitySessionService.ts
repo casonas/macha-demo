@@ -3,7 +3,26 @@ import { getFirebaseAuth } from '../firebaseConfig';
 const AUTH_API_BASE = process.env.REACT_APP_AUTH_API_BASE || '/api';
 const DEVICE_ID_KEY = 'macha.deviceId';
 
-type JsonRecord = Record<string, any>;
+type JsonRecord = Record<string, unknown>;
+type ApiErrorPayload = { error?: string };
+type GrecaptchaLike = { execute: (siteKey: string, input: { action: string }) => Promise<string> };
+
+export interface TrustedDeviceRecord {
+  deviceHash: string;
+  label?: string;
+  lastSeenIP?: string;
+  lastSeenUA?: string;
+  createdAt?: unknown;
+  expiresAt?: unknown;
+}
+
+export interface WebAuthnCredentialRecord {
+  credIdHash: string;
+  label?: string;
+  createdAt?: unknown;
+  lastUsedAt?: unknown;
+  revoked?: boolean;
+}
 
 function toBase64Url(bytes: Uint8Array): string {
   let binary = '';
@@ -41,7 +60,7 @@ async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
     },
   });
 
-  let payload: any = {};
+  let payload: unknown = {};
   try {
     payload = await response.json();
   } catch {
@@ -49,7 +68,8 @@ async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   if (!response.ok) {
-    throw new Error(payload.error || `API request failed (${response.status})`);
+    const errorPayload = payload as ApiErrorPayload;
+    throw new Error(errorPayload.error || `API request failed (${response.status})`);
   }
 
   return payload as T;
@@ -65,7 +85,7 @@ export function getOrCreateDeviceId(): string {
 
 async function maybeAttachRecaptcha(action: string): Promise<string> {
   const siteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
-  const maybeGrecaptcha = (window as any).grecaptcha;
+  const maybeGrecaptcha = (window as { grecaptcha?: GrecaptchaLike }).grecaptcha;
   if (!siteKey || !maybeGrecaptcha?.execute) return '';
   try {
     return await maybeGrecaptcha.execute(siteKey, { action });
@@ -226,7 +246,7 @@ export async function loginWithWebAuthn(emailOrUid?: string, rememberDevice = tr
   });
 }
 
-export async function listTrustedDevices(): Promise<Array<any>> {
+export async function listTrustedDevices(): Promise<TrustedDeviceRecord[]> {
   const authInit = await withAuthHeader({ method: 'GET' });
   const response = await fetch(`${AUTH_API_BASE}/account/trustedDevices`, {
     credentials: 'include',
@@ -234,7 +254,7 @@ export async function listTrustedDevices(): Promise<Array<any>> {
   });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.error || 'Failed to list trusted devices');
-  return payload.devices || [];
+  return (payload.devices || []) as TrustedDeviceRecord[];
 }
 
 export async function revokeTrustedDevice(deviceHash: string): Promise<void> {
@@ -244,7 +264,7 @@ export async function revokeTrustedDevice(deviceHash: string): Promise<void> {
   }));
 }
 
-export async function listWebauthnCredentials(): Promise<Array<any>> {
+export async function listWebauthnCredentials(): Promise<WebAuthnCredentialRecord[]> {
   const authInit = await withAuthHeader({ method: 'GET' });
   const response = await fetch(`${AUTH_API_BASE}/account/webauthnCredentials`, {
     credentials: 'include',
@@ -252,7 +272,7 @@ export async function listWebauthnCredentials(): Promise<Array<any>> {
   });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.error || 'Failed to list WebAuthn credentials');
-  return payload.credentials || [];
+  return (payload.credentials || []) as WebAuthnCredentialRecord[];
 }
 
 export async function revokeWebauthnCredential(credIdHash: string): Promise<void> {
@@ -261,4 +281,3 @@ export async function revokeWebauthnCredential(credIdHash: string): Promise<void
     body: JSON.stringify({ credIdHash }),
   }));
 }
-
