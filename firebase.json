@@ -20,6 +20,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "function": "authApi"
+      },
+      {
         "source": "/auth/action",
         "destination": "/index.html"
       },

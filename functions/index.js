@@ -14,11 +14,13 @@ const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { user } = require("firebase-functions/v1/auth");
+const { onRequest } = require("firebase-functions/v2/https");
 const {
   beforeUserCreated,
   beforeUserSignedIn,
   HttpsError,
 } = require("firebase-functions/v2/identity");
+const { routeAuthApi } = require("./authApi");
 
 initializeApp();
 
@@ -105,3 +107,8 @@ exports.beforesignedin = beforeUserSignedIn((event) => {
     },
   };
 });
+
+// ---------------------------------------------------------------------------
+// 5. HTTPS Auth API — session cookies, trusted devices, risk checks, WebAuthn
+// ---------------------------------------------------------------------------
+exports.authApi = onRequest({ cors: false }, routeAuthApi);

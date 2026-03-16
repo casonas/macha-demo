@@ -61,6 +61,62 @@ The app opens at **http://localhost:3000**.
 | `npm run build` | Create a production build          |
 | `npm test`      | Run tests                          |
 
+## Secure Session + Face ID (WebAuthn)
+
+This repo now includes a Firebase Functions auth API under `/api/**` with:
+
+- `POST /api/preAuthCheck` (trusted device + risk decision)
+- `POST /api/sessionLogin` (24h `createSessionCookie`, suspicious-login reCAPTCHA)
+- `POST /api/webauthn/registerOptions`, `POST /api/webauthn/register`
+- `POST /api/webauthn/authOptions`, `POST /api/webauthn/auth`
+- `GET/POST /api/account/trustedDevices*` and `GET/POST /api/account/webauthnCredentials*`
+
+### Firestore schema additions
+
+- `users/{uid}/trustedDevices/{deviceHash}`
+  - `createdAt`, `expiresAt`, `lastSeenIP`, `lastSeenUA`, `label`, `deviceHash`
+- `users/{uid}/webauthn/{credIdHash}`
+  - `credIdHash`, `publicKey`, `counter`, `transports`, `createdAt`, `lastUsedAt`, `revoked`
+- `securityConfig/auth`
+  - `recaptchaMinScore`, `maxTrustedDevices`
+
+### Required env vars
+
+Client (`.env.local`):
+
+- `REACT_APP_AUTH_API_BASE=/api`
+- `REACT_APP_RECAPTCHA_SITE_KEY=...` (recommended for suspicious-login checks)
+- `REACT_APP_ENABLE_PASSKEY=true` (to show Face ID / passkey UI)
+
+Functions (`firebase functions:config:set` or runtime env):
+
+- `RECAPTCHA_SECRET_KEY`
+- `RECAPTCHA_MIN_SCORE` (default `0.5`)
+- `MAX_TRUSTED_DEVICES` (default `5`)
+- `WEBAUTHN_RP_ID` (must match your HTTPS domain)
+- `WEBAUTHN_ORIGIN` (e.g., `https://your-domain.com`)
+- `WEBAUTHN_RP_NAME` (optional)
+
+### Security defaults
+
+- Session cookie flags: `Secure; HttpOnly; SameSite=Strict; Path=/`
+- Device IDs and WebAuthn credential IDs are SHA-256 hashed before storage
+- WebAuthn RP ID + origin are enforced on verification
+- Suspicious patterns (unknown/expired device, UA/IP drift, velocity/impossible travel) trigger reCAPTCHA
+
+### IAM least-privilege notes (Firebase Functions)
+
+- Use the default Functions service account only with:
+  - `Firebase Authentication Admin` (token verification/custom token/session cookie operations)
+  - `Cloud Datastore User` (Firestore read/write for `users/*`, config, and challenge docs)
+- Avoid broad roles such as `Editor` in production.
+- Restrict who can deploy Functions and who can edit runtime secrets.
+
+### Test commands
+
+- Client tests: `CI=true npm test -- --watchAll=false --passWithNoTests`
+- Functions risk/unit tests: `cd functions && node --test test/authApi.test.js`
+
 ## Deploying to Firebase
 
 ```bash
