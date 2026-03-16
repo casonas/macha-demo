@@ -1,9 +1,16 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import AppShell from '../layout/AppShell';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { getProfile, saveProfile, listAssessmentsByUser } from '../../services/data';
 import { MfaEnrollment } from '../molecules/MfaEnrollment';
+import {
+  registerWebAuthnCredential,
+  listTrustedDevices,
+  revokeTrustedDevice,
+  listWebauthnCredentials,
+  revokeWebauthnCredential,
+} from '../../services/auth/securitySessionService';
 import './pages.css';
 
 export const UserProfile: React.FC = () => {
@@ -22,6 +29,12 @@ export const UserProfile: React.FC = () => {
   });
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [trustedDevices, setTrustedDevices] = useState<Array<any>>([]);
+  const [webauthnCredentials, setWebauthnCredentials] = useState<Array<any>>([]);
+  const [securityLoading, setSecurityLoading] = useState(false);
+  const [securityError, setSecurityError] = useState('');
+  const [securitySuccess, setSecuritySuccess] = useState('');
+  const [faceIdEnabled, setFaceIdEnabled] = useState(false);
 
   const assessments = useMemo(() => user ? listAssessmentsByUser(user.id) : [], [user]);
   const userId = user?.id || initial.userId || 'N/A';
@@ -62,6 +75,77 @@ export const UserProfile: React.FC = () => {
 
   const updateField = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setEditForm(prev => ({ ...prev, [field]: e.target.value }));
+
+  const loadSecurityData = useCallback(async () => {
+    if (!user) return;
+    setSecurityLoading(true);
+    setSecurityError('');
+    try {
+      const [devices, credentials] = await Promise.all([
+        listTrustedDevices(),
+        listWebauthnCredentials(),
+      ]);
+      setTrustedDevices(devices);
+      setWebauthnCredentials(credentials);
+    } catch (err) {
+      setSecurityError(err instanceof Error ? err.message : 'Failed to load security data');
+    } finally {
+      setSecurityLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    setFaceIdEnabled(localStorage.getItem('macha.faceIdEnabled') === 'true');
+    void loadSecurityData();
+  }, [loadSecurityData]);
+
+  const handleRegisterFaceId = useCallback(async () => {
+    setSecurityLoading(true);
+    setSecurityError('');
+    setSecuritySuccess('');
+    try {
+      await registerWebAuthnCredential('My mobile Face ID');
+      setFaceIdEnabled(true);
+      localStorage.setItem('macha.faceIdEnabled', 'true');
+      setSecuritySuccess('Face ID / platform authenticator registered.');
+      await loadSecurityData();
+    } catch (err) {
+      setSecurityError(err instanceof Error ? err.message : 'Face ID registration failed');
+    } finally {
+      setSecurityLoading(false);
+    }
+  }, [loadSecurityData]);
+
+  const handleToggleFaceId = useCallback((enabled: boolean) => {
+    setFaceIdEnabled(enabled);
+    localStorage.setItem('macha.faceIdEnabled', String(enabled));
+  }, []);
+
+  const handleRevokeTrustedDevice = useCallback(async (deviceHash: string) => {
+    setSecurityLoading(true);
+    setSecurityError('');
+    try {
+      await revokeTrustedDevice(deviceHash);
+      await loadSecurityData();
+    } catch (err) {
+      setSecurityError(err instanceof Error ? err.message : 'Failed to revoke trusted device');
+    } finally {
+      setSecurityLoading(false);
+    }
+  }, [loadSecurityData]);
+
+  const handleRevokeCredential = useCallback(async (credIdHash: string) => {
+    setSecurityLoading(true);
+    setSecurityError('');
+    try {
+      await revokeWebauthnCredential(credIdHash);
+      await loadSecurityData();
+    } catch (err) {
+      setSecurityError(err instanceof Error ? err.message : 'Failed to revoke WebAuthn credential');
+    } finally {
+      setSecurityLoading(false);
+    }
+  }, [loadSecurityData]);
 
   return (
     <AppShell title="My Profile" isDashboard={true}>
@@ -221,6 +305,88 @@ export const UserProfile: React.FC = () => {
           </div>
 
           {/* 5. ASSESSMENT HISTORY CARD */}
+          <div
+            className="bg-white border border-slate-200 shadow-sm flex flex-col"
+            style={{ borderRadius: '2rem', padding: '3rem' }}
+          >
+            <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              Device &amp; Face ID Security
+            </h3>
+
+            {securityError && <p className="text-red-600 text-sm mb-3">{securityError}</p>}
+            {securitySuccess && <p className="text-emerald-700 text-sm mb-3">{securitySuccess}</p>}
+
+            <div className="flex flex-col gap-3 mb-5">
+              <label className="flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={faceIdEnabled}
+                  onChange={(e) => handleToggleFaceId(e.target.checked)}
+                />
+                Use Face ID / platform authenticator when available
+              </label>
+              <button
+                onClick={handleRegisterFaceId}
+                disabled={securityLoading}
+                className="px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-lg hover:bg-purple-700 disabled:opacity-60 w-fit"
+              >
+                Register Face ID
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <h4 className="font-bold text-slate-800 mb-2">Trusted Devices (24h)</h4>
+              {trustedDevices.length === 0 ? (
+                <p className="text-sm text-slate-500">No remembered devices.</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {trustedDevices.map((device) => (
+                    <div key={device.deviceHash} className="flex items-center justify-between border border-slate-200 rounded-lg px-3 py-2">
+                      <div className="text-xs text-slate-600">
+                        <div>{device.label || 'Remembered device'}</div>
+                        <div>{device.lastSeenIP || 'Unknown IP'} • {device.lastSeenUA || 'Unknown browser'}</div>
+                      </div>
+                      <button
+                        onClick={() => handleRevokeTrustedDevice(device.deviceHash)}
+                        disabled={securityLoading}
+                        className="px-3 py-1 text-xs font-semibold border border-red-200 text-red-600 rounded-md hover:bg-red-50"
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h4 className="font-bold text-slate-800 mb-2">Registered Face ID Credentials</h4>
+              {webauthnCredentials.length === 0 ? (
+                <p className="text-sm text-slate-500">No Face ID credentials registered yet.</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {webauthnCredentials.map((cred) => (
+                    <div key={cred.credIdHash} className="flex items-center justify-between border border-slate-200 rounded-lg px-3 py-2">
+                      <div className="text-xs text-slate-600">
+                        <div>{cred.label || 'Platform authenticator'}</div>
+                        <div>Credential hash: {cred.credIdHash?.slice(0, 12)}…</div>
+                      </div>
+                      <button
+                        onClick={() => handleRevokeCredential(cred.credIdHash)}
+                        disabled={securityLoading}
+                        className="px-3 py-1 text-xs font-semibold border border-red-200 text-red-600 rounded-md hover:bg-red-50"
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 6. ASSESSMENT HISTORY CARD */}
           <div 
             className="bg-white border border-slate-200 shadow-sm flex flex-col"
             style={{ borderRadius: '2rem', padding: '3rem' }}

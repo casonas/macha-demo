@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { MfaRequiredError, completeMfaLogin } from '../../services/auth/authService';
+import { MfaRequiredError, completeMfaLogin, signInWithCustomToken } from '../../services/auth/authService';
+import { getFirebaseAuth } from '../../services/firebaseConfig';
 import {
   initRecaptcha,
   isMfaEnrolled,
   startMfaSignIn,
   completeMfaSignIn
 } from '../../services/auth/mfaService';
+import {
+  preAuthCheck,
+  sessionLogin,
+  loginWithWebAuthn,
+} from '../../services/auth/securitySessionService';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Card } from '../atoms/Card';
@@ -29,6 +35,8 @@ export const LoginMock: React.FC = () => {
   const [passkeySupported, setPasskeySupported] = useState(false);
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [passkeyMessage, setPasskeyMessage] = useState('');
+  const [rememberDevice, setRememberDevice] = useState(true);
+  const [preAuthMessage, setPreAuthMessage] = useState('');
 
   // MFA state
   const [mfaStep, setMfaStep] = useState(false);
@@ -43,6 +51,21 @@ export const LoginMock: React.FC = () => {
   const mfaSmsSentRef = useRef(false);
 
   const from = (location.state as any)?.from?.pathname || '/home';
+
+  const finalizeServerSession = async (sourceLabel: string) => {
+    const fbUser = getFirebaseAuth().currentUser;
+    if (!fbUser) return;
+    try {
+      const idToken = await fbUser.getIdToken();
+      await sessionLogin({
+        idToken,
+        rememberDevice,
+        label: sourceLabel,
+      });
+    } catch (err) {
+      console.warn('Server session bootstrap failed, keeping Firebase client session only:', err);
+    }
+  };
 
   // When the MFA view is shown, the login-form DOM is replaced, so the
   // RecaptchaVerifier must be (re-)initialized against the new element that is
@@ -87,9 +110,19 @@ export const LoginMock: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
+      setPreAuthMessage('');
+      if (email.trim()) {
+        const pre = await preAuthCheck(email.trim());
+        if (pre.trusted && !pre.requireMfa) {
+          setPreAuthMessage('Trusted device recognized. You may not need another MFA challenge.');
+        } else if (pre.requireRecaptcha) {
+          setPreAuthMessage('Additional anti-abuse checks may be required for this sign-in.');
+        }
+      }
       await login(email, password);
+      await finalizeServerSession('email-password');
       // Successful login without MFA challenge — user either has no MFA
       // enrolled or Firebase did not require a second factor.
       // If MFA is not enrolled, redirect to MFA setup for first-time enrollment.
@@ -128,6 +161,7 @@ export const LoginMock: React.FC = () => {
       if (mfaPendingUser) {
         completeMfaLogin(mfaPendingUser);
       }
+      await finalizeServerSession('mfa');
       navigate(from, { replace: true });
     } catch (err) {
       setMfaError(err instanceof Error ? err.message : 'Invalid verification code');
@@ -148,6 +182,7 @@ export const LoginMock: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
+      await finalizeServerSession('google-oauth');
       // If MFA is not enrolled, redirect to MFA setup for first-time enrollment.
       if (!isMfaEnrolled()) {
         navigate('/mfa-setup', { replace: true });
@@ -172,17 +207,13 @@ export const LoginMock: React.FC = () => {
     setPasskeyMessage('');
     setPasskeyLoading(true);
     try {
-      const configuredEndpoint = process.env.REACT_APP_PASSKEY_LOGIN_ENDPOINT;
-      if (!configuredEndpoint) {
-        setPasskeyMessage(
-          'Passkey is supported on this device, but server verification is not configured yet. Continue with your normal sign-in method.'
-        );
-        return;
-      }
-      // Scaffold only: endpoint wiring is intentionally optional and backend-dependent.
-      setPasskeyMessage(
-        'Passkey endpoint detected. Complete WebAuthn challenge wiring on the backend to finish passkey login.'
-      );
+      const result = await loginWithWebAuthn(email.trim() || undefined, rememberDevice);
+      await signInWithCustomToken(result.customToken);
+      await finalizeServerSession('webauthn-passkey');
+      navigate(from, { replace: true });
+      return;
+    } catch (err) {
+      setPasskeyMessage(err instanceof Error ? err.message : 'Passkey sign-in failed.');
     } finally {
       setPasskeyLoading(false);
     }
@@ -220,6 +251,14 @@ export const LoginMock: React.FC = () => {
               required
               fullWidth
             />
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>
+              <input
+                type="checkbox"
+                checked={rememberDevice}
+                onChange={(e) => setRememberDevice(e.target.checked)}
+              />
+              Remember this device for 24 hours
+            </label>
 
             <Button
               type="submit"
@@ -281,6 +320,18 @@ export const LoginMock: React.FC = () => {
             required
             fullWidth
           />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>
+            <input
+              type="checkbox"
+              checked={rememberDevice}
+              onChange={(e) => setRememberDevice(e.target.checked)}
+            />
+            Remember this device for 24 hours
+          </label>
+
+          {preAuthMessage && (
+            <p className="login-mock__hint">{preAuthMessage}</p>
+          )}
 
           <Button 
             type="submit" 
