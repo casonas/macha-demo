@@ -68,7 +68,10 @@ export function useAuth(): UseAuthReturn {
       setUser(u);
       if (u) {
         setCurrentUserId(u.id);
-        startSessionMonitor();
+        if (document.cookie.includes("session")) {
+          startSessionMonitor();
+          }
+        }
       } else {
         setCurrentUserId('');
         stopSessionMonitor();
