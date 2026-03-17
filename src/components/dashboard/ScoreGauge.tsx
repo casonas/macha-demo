@@ -3,6 +3,7 @@ import React from 'react';
 export default function ScoreGauge({ value }: { value: number }) {
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
+  // Convert the 0-100 score into the remaining stroke length for the SVG ring.
   const offset = circumference - (Math.max(0, Math.min(100, value)) / 100) * circumference;
 
   return (

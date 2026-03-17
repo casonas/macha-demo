@@ -13,6 +13,8 @@ function getRiskLevel(score: number) {
 }
 
 function countFindings(responses: Record<string, any>) {
+  // Reports currently treat negative boolean answers ("false"/"No") as
+  // findings and ignore free-text comment fields when counting totals.
   let total = 0;
   Object.entries(responses).forEach(([key, value]) => {
     if (key.endsWith('Comment')) return;
@@ -32,6 +34,8 @@ export const ReportView: React.FC = () => {
   const assessment = useMemo(() => {
     if (!id) return null;
     const record = getAssessmentById(id);
+    // Protect against manually entered URLs by hiding records that belong to a
+    // different local user, even though routes are already behind AuthGuard.
     if (record && user && record.userId && record.userId !== user.id) return null;
     return record;
   }, [id, user]);
@@ -39,7 +43,8 @@ export const ReportView: React.FC = () => {
   // Load the assessment definition to get full question text
   const { assessment: assessmentDef } = useAssessment(assessment?.assessmentId ?? null);
 
-  // Build a map from question ID to full question text
+  // Completed records store response keys, not denormalized prompt text, so we
+  // rebuild this map from the assessment definition for readable findings/photos.
   const questionTextMap = useMemo(() => {
     const map: Record<string, string> = {};
     if (assessmentDef) {

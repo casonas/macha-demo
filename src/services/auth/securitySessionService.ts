@@ -51,6 +51,8 @@ function bufferToBase64Url(buffer: ArrayBuffer): string {
 }
 
 async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  // Shared JSON request helper for the auth API. It always includes cookies
+  // for the server session and normalizes JSON error payloads into throwables.
   const response = await fetch(`${AUTH_API_BASE}${path}`, {
     credentials: 'include',
     ...init,
@@ -153,6 +155,8 @@ export async function registerWebAuthnCredential(label?: string): Promise<void> 
 
   const publicKey: PublicKeyCredentialCreationOptions = {
     ...options,
+    // The server sends challenge/user ids as base64url strings; the browser
+    // WebAuthn APIs require them as ArrayBuffers.
     challenge: ensureArrayBuffer(options.challenge as unknown as string),
     user: {
       ...(options.user as PublicKeyCredentialUserEntity),
@@ -203,6 +207,8 @@ export async function loginWithWebAuthn(emailOrUid?: string, rememberDevice = tr
   const options = authOptionsPayload.options;
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...options,
+    // Convert server-safe base64url values back into binary before handing the
+    // assertion request to the browser credential APIs.
     challenge: ensureArrayBuffer(options.challenge as unknown as string),
     allowCredentials: Array.isArray(options.allowCredentials)
       ? options.allowCredentials.map((cred: any) => ({

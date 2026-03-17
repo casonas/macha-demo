@@ -43,6 +43,8 @@ export const EmailActionHandler: React.FC = () => {
 
     const auth = getFirebaseAuth();
 
+    // This page replaces Firebase's hosted email action screens so password
+    // reset, verification, and recovery flows can stay inside the SPA.
     switch (mode) {
       case 'resetPassword':
         verifyPasswordResetCode(auth, actionCode)
@@ -76,7 +78,8 @@ export const EmailActionHandler: React.FC = () => {
             return applyActionCode(auth, actionCode).then(() => {
               setStatus('success');
               setMessage(`Your email has been restored to ${restoredEmail}.`);
-              // Send a password reset for security
+              // Recovering an email address may indicate account takeover, so
+              // we follow up by sending a password reset to the restored address.
               if (restoredEmail) {
                 sendPasswordResetEmail(auth, restoredEmail).catch((err) => {
                   console.error('Failed to send password reset after email recovery:', err);

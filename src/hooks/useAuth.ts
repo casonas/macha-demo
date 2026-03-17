@@ -67,6 +67,8 @@ export function useAuth(): UseAuthReturn {
     const unsubscribe = subscribeToAuthState((u) => {
       setUser(u);
       if (u) {
+        // Keep the local assessment layer in sync with the current auth user so
+        // user-scoped demo data reads/writes resolve against the right key.
         setCurrentUserId(u.id);
         startSessionMonitor();
       } else {

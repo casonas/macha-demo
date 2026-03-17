@@ -72,6 +72,8 @@ onSave?.(responses);
 const handleSubmit = useCallback(async () => {
 if (!assessment) return;
 
+// Submission is allowed once the user has captured some data; this flow does
+// not require every question or section to be complete before generating a report.
 const answeredAny = Object.values(responses).some(v => v !== '' && v !== null && v !== undefined);
 if (!answeredAny) {
 setValidationErrors({ __formError: 'Please answer at least one question before submitting.' });
@@ -89,6 +91,8 @@ setIsSubmitting(false);
 const categoryProgress = useMemo(() => {
 if (!assessment) return [];
 
+// Progress is based on any non-empty response per question, not on required
+// fields, comments, or subsection-level completion.
 return assessment.categories.map((c, idx) => {
 const total = c.questions.length;
 const answered = c.questions.filter((q) => {
@@ -137,7 +141,9 @@ const needle = activeQuery.toLowerCase();
 return q.text.toLowerCase().includes(needle) || q.id.toLowerCase().includes(needle);
 };
 
-// When searching, gather results from ALL categories; otherwise use the current one
+// Search changes the information architecture: instead of staying within the
+// active category, we surface matching groups from every category in one list.
+// When not searching, the form stays scoped to the current category.
 const categoriesToShow = isSearching ? assessment.categories : [currentCategory];
 
 const allVisibleGroups: { categoryTitle: string; name: string; questions: Question[] }[] = [];

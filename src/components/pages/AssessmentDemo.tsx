@@ -8,6 +8,8 @@ import './AssessmentDemo.css';
 export const AssessmentDemo: React.FC = () => {
 const [params] = useSearchParams();
 const navigate = useNavigate();
+// Prefer the explicit route param, then the last active draft, and finally a
+// local fallback so the demo screen can still render in an unseeded environment.
 const recordId = params.get('id') || getActiveAssessmentId() || 'AS-LOCAL';
 const record = getAssessmentById(recordId);
 const assessmentId = record?.assessmentId || 'school-security-v1';

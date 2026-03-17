@@ -47,6 +47,9 @@ function isExpiredDate(expiresAt) {
 }
 
 function assessRisk({ trustedDevice, currentIp, currentUa, userSecurity }) {
+  // Central risk policy for step-up auth decisions. We treat device expiry,
+  // UA drift, network changes, and recent-login anomalies as signals that can
+  // trigger reCAPTCHA and/or MFA even when the user has signed in before.
   const reasons = [];
   const trusted = Boolean(trustedDevice && !isExpiredDate(trustedDevice.expiresAt));
 
@@ -314,6 +317,9 @@ async function handleSessionLogin(req, res) {
     userSecurity,
   });
 
+  // This endpoint is the server-side session bootstrap. It re-checks risk
+  // after primary auth, gates suspicious logins with reCAPTCHA, then issues
+  // the hardened session cookie and optionally refreshes trusted-device state.
   if (risk.requireRecaptcha) {
     const recaptcha = await verifyRecaptchaToken(recaptchaToken, req, config);
     if (!recaptcha.ok) {
@@ -466,6 +472,8 @@ async function handleWebauthnAuthOptions(req, res) {
     ? await getUidFromIdentifier(getAuth(), String(identifier))
     : '';
 
+  // Store a short-lived challenge separately from the credential itself so the
+  // later auth step can verify freshness and optionally narrow lookup by uid.
   await db.collection('webauthnChallenges').doc(challengeId).set({
     challenge: options.challenge,
     uidHint,
@@ -480,6 +488,8 @@ async function handleWebauthnAuthOptions(req, res) {
 }
 
 async function findWebauthnCredential(db, credIdHash, uidHint) {
+  // Fast path: if the client hinted the user, check that user's credential
+  // directly before falling back to a broader collection-group lookup.
   if (uidHint) {
     const direct = await db.collection('users').doc(uidHint).collection('webauthn').doc(credIdHash).get();
     if (direct.exists && !direct.data()?.revoked) {
@@ -554,6 +564,9 @@ async function handleWebauthnAuth(req, res) {
     userSecurity,
   });
 
+  // Passkey sign-in still runs through the same risk engine as password login:
+  // suspicious context can require reCAPTCHA and remembered-device updates
+  // before we mint the custom token used by the client app.
   if (risk.requireRecaptcha) {
     const config = await getSecurityConfig(db);
     const recaptcha = await verifyRecaptchaToken(recaptchaToken, req, config);

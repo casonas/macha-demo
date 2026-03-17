@@ -72,6 +72,8 @@ export const MfaSetup: React.FC = () => {
   useEffect(() => {
     if (step !== 'email-verify' || autoResendAttemptedRef.current) return;
     autoResendAttemptedRef.current = true;
+    // Give newly registered users a best-effort resend when they land here so
+    // they are not blocked if the original verification email was missed.
     resendEmailVerification()
       .then(() => setEmailSent(true))
       .catch(() => {
