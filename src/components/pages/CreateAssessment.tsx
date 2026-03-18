@@ -20,6 +20,7 @@ export const CreateAssessment: React.FC = () => {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [buildingType, setBuildingType] = useState('');
+  // The current flow creates instances of a single bundled assessment template.
   const [assessmentId] = useState('school-security-v1');
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -30,6 +31,8 @@ export const CreateAssessment: React.FC = () => {
     if (!isValid) return;
     const rec = createAssessment({
       name,
+      // This is a lightweight slug for demo data, not a lookup to a canonical
+      // facility/building record from a backend system.
       buildingId: buildingType.toLowerCase().replace(/[\s/]+/g, '-'),
       assessmentId,
       address,

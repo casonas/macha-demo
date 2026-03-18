@@ -26,6 +26,8 @@ export const HomeScreen: React.FC = () => {
   const lastAssessment = assessments[0];
   const firstName = (user?.displayName || 'there').split(' ')[0];
 
+  // Dashboard progress needs both the saved assessment record (answers/status)
+  // and the assessment definition (question count) to compute completion.
   const { assessment: assessmentDef } = useAssessment(lastAssessment?.assessmentId ?? null);
   const totalQuestions = useMemo(() => {
     if (!assessmentDef) return 0;
@@ -40,6 +42,8 @@ export const HomeScreen: React.FC = () => {
   }, [lastAssessment]);
 
   const percentComplete = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+  // Submitted assessments always display as 100% complete even if the report
+  // was generated from a partially answered form.
   const latestProgress = lastAssessment?.status === 'completed' ? 100 : percentComplete;
   const latestProgressLabel = lastAssessment?.status === 'completed'
     ? 'Submitted'

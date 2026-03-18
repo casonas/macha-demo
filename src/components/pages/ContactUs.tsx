@@ -7,6 +7,8 @@ export const ContactUs: React.FC = () => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Demo-only contact flow: submitting toggles the confirmation state but
+    // does not currently send the message to a backend or email service.
     setSubmitted(true);
   };
 

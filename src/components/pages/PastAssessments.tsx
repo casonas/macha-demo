@@ -12,6 +12,8 @@ export const PastAssessments: React.FC = () => {
 
   const rows = useMemo(() => {
     if (!user) return [];
+    // Local deletes do not emit a store event, so this key forces the memoized
+    // list to recompute after destructive actions on the current page.
     void refreshKey; 
     return listAssessmentsByUser(user.id);
   }, [user, refreshKey]);

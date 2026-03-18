@@ -5,6 +5,8 @@ describe('securitySessionService', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    // Stub UUID generation so device-id creation is deterministic and the test
+    // can assert persistence without depending on real randomness.
     Object.defineProperty(global, 'crypto', {
       value: { randomUUID: () => 'uuid-1' },
       configurable: true,

@@ -29,6 +29,8 @@ export interface SelectOption {
 
 // Question Definition
 export interface Question {
+  // This interface is broader than the current UI renderer: some fields support
+  // future schema-driven behaviors that are not yet fully surfaced in forms.
   id: string;
   type: QuestionType;
   text: string;
@@ -72,6 +74,8 @@ export interface Assessment {
 export type ResponseValue = boolean | string | number | string[];
 
 export interface ResponseData {
+  // Runtime code may also store comment values under derived keys such as
+  // `${questionId}Comment`, even though the type models primary answers only.
   [questionId: string]: ResponseValue;
 }
 

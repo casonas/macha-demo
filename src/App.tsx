@@ -17,6 +17,8 @@ import { EmailActionHandler } from './components/pages/EmailActionHandler';
 import './App.css';
 
 function Protected({ children }: { children: React.ReactNode }) {
+  // AuthGuard handles both signed-in access and one-time MFA enrollment gates
+  // before protected screens can render.
   return <AuthGuard>{children}</AuthGuard>;
 }
 

@@ -51,6 +51,8 @@ export const CreateAccount: React.FC = () => {
     }
 
     try {
+      // Store phone numbers in +1XXXXXXXXXX form because the MFA enrollment
+      // flow reuses this value as the default phone input/source of truth.
       const phoneWithCode = `+1${form.phone.trim().replace(/\D/g, '')}`;
       await register(form.fullName, form.email, form.password, {
         phone: phoneWithCode,

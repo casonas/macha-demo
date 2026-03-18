@@ -53,6 +53,8 @@ export const LoginMock: React.FC = () => {
   const from = (location.state as any)?.from?.pathname || '/home';
 
   const finalizeServerSession = async (sourceLabel: string) => {
+    // Firebase client auth keeps the browser signed in, but this app also
+    // maintains a server-issued session cookie used by the auth API.
     const fbUser = getFirebaseAuth().currentUser;
     if (!fbUser) return;
     try {
@@ -112,6 +114,8 @@ export const LoginMock: React.FC = () => {
     e.preventDefault();
 
     try {
+      // Run a lightweight pre-check first so the UI can hint whether this
+      // login is likely to be treated as trusted or stepped up by the server.
       setPreAuthMessage('');
       if (email.trim()) {
         const pre = await preAuthCheck(email.trim());

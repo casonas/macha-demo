@@ -83,6 +83,8 @@ export const UserProfile: React.FC = () => {
     setSecurityLoading(true);
     setSecurityError('');
     try {
+      // Load both device inventories together so the profile can render the
+      // current trusted browsers and registered passkeys in one refresh.
       const [devices, credentials] = await Promise.all([
         listTrustedDevices(),
         listWebauthnCredentials(),

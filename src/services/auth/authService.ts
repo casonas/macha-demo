@@ -186,6 +186,8 @@ export function subscribeToAuthState(listener: AuthStateListener): () => void {
     };
   }
 
+  // Mock mode has no background auth observer, so we emit the persisted
+  // local session immediately to mirror Firebase's initial auth callback.
   // Emit initial mock auth state on subscription so hooks can resolve loading
   // without requiring a separate getCurrentUser() call.
   void getCurrentUser()
@@ -230,6 +232,8 @@ export async function login(email: string, password: string): Promise<User> {
     }
   }
 
+  // Local/mock mode intentionally models a few production behaviors here:
+  // timed lockouts, per-user MFA enrollment, and trusted-device bypass.
   // Mock login
   await new Promise(resolve => setTimeout(resolve, 500));
   const key = email.toLowerCase();
@@ -363,6 +367,8 @@ export async function updateCurrentUserProfile(input: { displayName: string }): 
     }
   }
 
+  // In mock mode the auth profile and the locally stored session/user record
+  // are the same source of truth, so we update both together here.
   const current = await getCurrentUser();
   if (!current) return null;
 
@@ -459,6 +465,8 @@ export async function signInWithCustomToken(customToken: string): Promise<User> 
 }
 
 export async function refreshSession(): Promise<void> {
+  // Only mock mode uses an expiring local session object that needs to be
+  // manually extended; Firebase persistence handles this separately.
   if (USE_FIREBASE) return;
   const sessionJson = localStorage.getItem('mockAuthSession');
   if (!sessionJson) return;
@@ -490,6 +498,7 @@ function resetInactivityTimer() {
 export function startSessionMonitor() {
   // For Firebase Auth, rely on Firebase token/session persistence instead of
   // forcing a client-side inactivity sign-out that can trigger repeated MFA.
+  // The inactivity timeout is only used for the mock session implementation.
   if (USE_FIREBASE) return;
   const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
   events.forEach(evt => window.addEventListener(evt, resetInactivityTimer, { passive: true }));

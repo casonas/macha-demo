@@ -33,6 +33,8 @@ export const AppShell: React.FC<AppShellProps> = ({ title, children, isDashboard
   useEffect(() => {
     if (mobileOpenRef.current) {
       setMobileOpen(false);
+      // After a navigation from the mobile drawer, move focus back to the main
+      // region so keyboard/screen-reader users land in the newly loaded content.
       requestAnimationFrame(() => {
         mainRef.current?.focus();
       });
@@ -90,6 +92,8 @@ export const AppShell: React.FC<AppShellProps> = ({ title, children, isDashboard
       {/* 2. Added dynamic classes to remove padding when on the Dashboard */}
       <main
         ref={mainRef}
+        // Dashboard-style pages opt into a full-bleed layout so they can own
+        // their spacing instead of inheriting the standard shell header/padding.
         className={`shell__main ${isDashboard ? 'shell__main--dashboard' : ''}`}
         tabIndex={-1}
       >

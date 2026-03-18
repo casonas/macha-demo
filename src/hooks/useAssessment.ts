@@ -76,6 +76,8 @@ export function useAssessmentResponse(
   initialResponses: ResponseData = {}
 ): UseAssessmentResponseReturn {
   const [responses, setResponses] = useState<ResponseData>(initialResponses);
+  // Photo attachments are tracked separately from the main response object so
+  // text/boolean answers can stay lightweight and serializable on their own.
   const [photos, setPhotos] = useState<Record<string, { name: string; dataUrl: string }[]>>({});
 
   const updateResponse = useCallback((questionId: string, value: any) => {
@@ -86,6 +88,8 @@ export function useAssessmentResponse(
   }, []);
 
   const updateComment = useCallback((questionId: string, comment: string) => {
+    // Comment fields are flattened into the same response bag using a derived
+    // key so reports/storage can look them up without a separate schema.
     const commentKey = `${questionId}Comment`;
     setResponses(prev => ({
       ...prev,
@@ -103,6 +107,8 @@ export function useAssessmentResponse(
   }, [responses]);
 
   const isComplete = useCallback((requiredQuestionIds: string[]) => {
+    // Completion here only checks required answer slots; optional comments and
+    // photo attachments do not affect whether a section is considered complete.
     return requiredQuestionIds.every(id => {
       const value = responses[id];
       return value !== undefined && value !== null && value !== '';

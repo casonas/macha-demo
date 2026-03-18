@@ -67,6 +67,8 @@ async function saveAssessmentToFirestore(record: AssessmentRecord) {
     const { doc, setDoc, serverTimestamp } = await import('firebase/firestore');
     const { getFirebaseDb } = await import('../firebaseConfig');
     const db = getFirebaseDb();
+    // Keep localStorage as the primary write path for the demo UX, then mirror
+    // the structured assessment record to Firestore without embedding photo data.
     const { photos, ...data } = record;
     await setDoc(doc(db, 'userAssessments', record.id), {
       ...data,
@@ -110,6 +112,8 @@ export function deleteAssessment(id: string): void {
 }
 
 export function upsertAssessment(record: AssessmentRecord) {
+  // Assessments are partitioned by the active user when available so local demo
+  // data does not bleed across accounts sharing the same browser.
   const key = userAssessKey(record.userId);
   const all = load<AssessmentRecord[]>(key, []);
   const idx = all.findIndex(x => x.id === record.id);
@@ -162,6 +166,8 @@ export function completeAssessment(id: string, responses: Record<string, any>, p
   const found = getAssessmentById(id);
   if (!found) return;
   const answered = Object.values(responses).filter(v => v !== '' && v !== null && v !== undefined).length;
+  // Demo scoring is intentionally lightweight: completion volume maps to a
+  // bounded score until a domain-specific scoring model replaces it.
   const score = Math.max(60, Math.min(100, Math.round(60 + answered * 1.2)));
   const updated: AssessmentRecord = { ...found, responses, status: 'completed', score, updatedAt: now(), photos };
   upsertAssessment(updated);
